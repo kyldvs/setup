@@ -8,6 +8,8 @@ KYLDVS_PREFIX="/usr/local/kyldvs"
 KYLDVS_REPOSITORY="${KYLDVS_PREFIX}/setup"
 KYLDVS_BIN="${KYLDVS_PREFIX}/bin"
 
+# TODO: Move these to the justfile.
+
 # Handle the shellenv command to output PATH setup
 if [[ "${1:-}" == "shellenv" ]]; then
   cat <<EOS

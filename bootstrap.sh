@@ -826,11 +826,20 @@ fi
   # Link kyldvs.sh to PREFIX/bin folder.
   execute "/bin/ln" "-sf" "${KYLDVS_REPOSITORY}/mac/kyldvs.sh" "${KYLDVS_PREFIX}/bin/kyldvs"
 
-  ohai "Installing Homebrew..."
-  execute "${KYLDVS_REPOSITORY}/mac/setup/homebrew.sh"
 
-  ohai "Installing Just..."
-  execute "${KYLDVS_REPOSITORY}/mac/setup/just.sh"
+  if ! command -v brew >/dev/null
+  then
+    ohai "Installing Homebrew..."
+    /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+  fi
+
+  if ! command -v just >/dev/null
+  then
+    ohai "Installing Just..."
+    brew install just
+  fi
+
+  # TODO: Then defer to `just` as the binary to run.
 
   # TODO: Move this to the kyldvs bin.
   # ===========================================================================
