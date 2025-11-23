@@ -819,8 +819,10 @@ fi
 
   execute "${USABLE_GIT}" "remote" "set-head" "origin" "--auto" >/dev/null
 
-  # TODO: Verify if this works.
-  execute "${USABLE_GIT}" "checkout" "--quiet" "--force" "-B" "main" "main"
+  execute "${USABLE_GIT}" "checkout" "--quiet" "--force" "-B" "main" "origin/main"
+
+  # TODO: Now that we will have the repo; run commands from the repo instead of
+  # embedded here (?)
 
   # ===========================================================================
   # Mac Settings via Defaults
