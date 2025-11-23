@@ -513,6 +513,7 @@ done
 
 directories=(
   bin lib
+  share/zsh share/zsh/site-functions
 )
 mkdirs=()
 for dir in "${directories[@]}"
