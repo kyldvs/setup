@@ -1,0 +1,45 @@
+# misc
+.DS_Store
+*.pem
+
+# env files
+.env*
+!.env.example
+
+# dependencies
+node_modules
+.pnp
+.pnp.js
+
+# debug
+npm-debug.log*
+
+# use pnpm, not npm
+.package-lock.json
+
+# Python workspace
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+uv.lock
+.venv/
+*.egg-info/
+dist/
+build/
+
+# TypeScript workspace
+*.tsbuildinfo
+.next/
+.turbo/
+pnpm-lock.yaml
+
+# Editors
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+Thumbs.db
