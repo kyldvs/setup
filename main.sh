@@ -447,7 +447,9 @@ else
   fi
 fi
 
-directories=()
+directories=(
+  bin lib
+)
 group_chmods=()
 for dir in "${directories[@]}"
 do
