@@ -148,6 +148,11 @@ CHMOD=("/bin/chmod")
 MKDIR=("/bin/mkdir" "-p")
 KYLDVS_DEFAULT_GIT_REMOTE="https://github.com/kyldvs/setup"
 
+# TODO: bump version when new macOS is released or announced
+MACOS_NEWEST_UNSUPPORTED="27.0"
+# TODO: bump version when new macOS is released
+MACOS_OLDEST_SUPPORTED="14.0"
+
 # Unset this from the environment
 unset HAVE_SUDO_ACCESS
 
@@ -444,6 +449,45 @@ else
   if [[ "${UNAME_MACHINE}" != "x86_64" ]] && [[ "${UNAME_MACHINE}" != "aarch64" ]]
   then
     abort "Setup on Linux is only supported on Intel x86_64 and ARM64 processors!"
+  fi
+fi
+
+if [[ -n "${KYLDVS_ON_MACOS-}" ]]
+then
+  macos_version="$(major_minor "$(/usr/bin/sw_vers -productVersion)")"
+  if version_lt "${macos_version}" "10.7"
+  then
+    abort "$(
+      cat <<EOABORT
+Your Mac OS X version is too old. See:
+  ${tty_underline}https://github.com/mistydemeo/tigerbrew${tty_reset}
+EOABORT
+    )"
+  elif version_lt "${macos_version}" "10.11"
+  then
+    abort "Your OS X version is too old."
+  elif version_ge "${macos_version}" "${MACOS_NEWEST_UNSUPPORTED}" ||
+       version_lt "${macos_version}" "${MACOS_OLDEST_SUPPORTED}"
+  then
+    who="We"
+    what=""
+    if version_ge "${macos_version}" "${MACOS_NEWEST_UNSUPPORTED}"
+    then
+      what="pre-release version"
+    else
+      who+=" (and Apple)"
+      what="old version"
+    fi
+    ohai "You are using macOS ${macos_version}."
+    ohai "${who} do not provide support for this ${what}."
+
+    echo "$(
+      cat <<EOS
+This installation may not succeed. You are responsible for resolving any
+issues you experience while you are running this ${what}.
+EOS
+    )
+" | tr -d "\\"
   fi
 fi
 
