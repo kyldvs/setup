@@ -3,8 +3,10 @@
 Commands to setup a new computer. Opinionated for myself.
 
 ```
-/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/kyldvs/setup/HEAD/main.sh)"
+/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/kyldvs/setup/HEAD/bootstrap.sh)"
 ```
+
+This makes the `kyldvs` command available (after you add it to `PATH`).
 
 ## Development
 

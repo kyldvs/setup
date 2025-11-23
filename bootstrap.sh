@@ -116,9 +116,9 @@ if [[ -n "${KYLDVS_ON_MACOS-}" ]]
 then
   UNAME_MACHINE="$(/usr/bin/uname -m)"
 
-  # Install to /usr/local/kyldvs/setup
-  KYLDVS_PREFIX="/usr/local/kyldvs/setup"
-  KYLDVS_REPOSITORY="${KYLDVS_PREFIX}"
+  # Install to /usr/local/kyldvs
+  KYLDVS_PREFIX="/usr/local/kyldvs"
+  KYLDVS_REPOSITORY="${KYLDVS_PREFIX}/setup"
 
   # Define platform-specific commands and paths.
   STAT_PRINTF=("/usr/bin/stat" "-f")
@@ -131,9 +131,9 @@ then
 else
   UNAME_MACHINE="$(uname -m)"
 
-  # On Linux, this script installs to /home/kyldvs/setup only.
-  KYLDVS_PREFIX="/home/kyldvs/setup"
-  KYLDVS_REPOSITORY="${KYLDVS_PREFIX}"
+  # On Linux, this script installs to /home/kyldvs only.
+  KYLDVS_PREFIX="/home/kyldvs"
+  KYLDVS_REPOSITORY="${KYLDVS_PREFIX}/setup"
 
   # Define platform-specific commands and paths.
   STAT_PRINTF=("/usr/bin/stat" "-c")
@@ -148,8 +148,6 @@ CHMOD=("/bin/chmod")
 MKDIR=("/bin/mkdir" "-p")
 
 KYLDVS_SETUP_GIT_REMOTE="https://github.com/kyldvs/setup"
-# TODO: not sure if we'll use this.
-KYLDVS_DOTFILES_GIT_REMOTE="https://github.com/kyldvs/dotfiles"
 
 # TODO: bump version when new macOS is released or announced
 MACOS_NEWEST_UNSUPPORTED="27.0"
@@ -489,8 +487,7 @@ then
   then
     abort "$(
       cat <<EOABORT
-Your Mac OS X version is too old. See:
-  ${tty_underline}https://github.com/mistydemeo/tigerbrew${tty_reset}
+Your Mac OS X version is too old.
 EOABORT
     )"
   elif version_lt "${macos_version}" "10.11"
@@ -522,7 +519,8 @@ EOS
 fi
 
 directories=(
-  bin lib
+  bin lib logs tmp
+  setup
 )
 group_chmods=()
 for dir in "${directories[@]}"
@@ -542,7 +540,8 @@ do
 done
 
 directories=(
-  bin lib
+  bin lib logs tmp
+  setup
   share/zsh share/zsh/site-functions
 )
 mkdirs=()
@@ -824,6 +823,16 @@ fi
   # TODO: Now that we will have the repo; run commands from the repo instead of
   # embedded here (?)
 
+  # Link kyldvs.sh to PREFIX/bin folder.
+  execute "/bin/ln" "-sf" "${KYLDVS_REPOSITORY}/mac/kyldvs.sh" "${KYLDVS_PREFIX}/bin/kyldvs"
+
+  ohai "Installing Homebrew..."
+  execute "${KYLDVS_REPOSITORY}/mac/setup/homebrew.sh"
+
+  ohai "Installing Just..."
+  execute "${KYLDVS_REPOSITORY}/mac/setup/just.sh"
+
+  # TODO: Move this to the kyldvs bin.
   # ===========================================================================
   # Mac Settings via Defaults
   # ===========================================================================
@@ -837,10 +846,6 @@ fi
 
 ohai "Installation successful!"
 echo
-
-# Homebrew pre-requisites.
-# TODO: Install git.
-# TODO: Install curl.
 
 ohai "Next steps:"
 case "${SHELL}" in
@@ -868,7 +873,22 @@ case "${SHELL}" in
     ;;
 esac
 
-cat <<EOS
-- Run this command in your terminal to setup your ${tty_bold}PATH${tty_reset}:
-    (todo - figure out a setup command)
+if grep -qs "eval \"\$(${KYLDVS_PREFIX}/bin/kyldvs shellenv)\"" "${shell_rcfile}"
+then
+  if ! [[ -x "$(command -v kyldvs)" ]]
+  then
+    cat <<EOS
+- Run this command in your terminal to add kyldvs to your ${tty_bold}PATH${tty_reset}:
+    eval "\$(${KYLDVS_PREFIX}/bin/kyldvs shellenv)"
 EOS
+  fi
+else
+  cat <<EOS
+- Run these commands in your terminal to add kyldvs to your ${tty_bold}PATH${tty_reset}:
+    echo >> ${shell_rcfile}
+    echo 'eval "\$(${KYLDVS_PREFIX}/bin/kyldvs shellenv)"' >> ${shell_rcfile}
+    eval "\$(${KYLDVS_PREFIX}/bin/kyldvs shellenv)"
+EOS
+fi
+
+echo
