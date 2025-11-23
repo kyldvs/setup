@@ -146,12 +146,17 @@ else
 fi
 CHMOD=("/bin/chmod")
 MKDIR=("/bin/mkdir" "-p")
-KYLDVS_DEFAULT_GIT_REMOTE="https://github.com/kyldvs/setup"
+
+KYLDVS_SETUP_GIT_REMOTE="https://github.com/kyldvs/setup"
+# TODO: not sure if we'll use this.
+KYLDVS_DOTFILES_GIT_REMOTE="https://github.com/kyldvs/dotfiles"
 
 # TODO: bump version when new macOS is released or announced
 MACOS_NEWEST_UNSUPPORTED="27.0"
 # TODO: bump version when new macOS is released
 MACOS_OLDEST_SUPPORTED="14.0"
+REQUIRED_CURL_VERSION=7.41.0
+REQUIRED_GIT_VERSION=2.7.0
 
 # Unset this from the environment
 unset HAVE_SUDO_ACCESS
@@ -394,6 +399,29 @@ find_tool() {
   done < <(which -a "$1")
 }
 
+# Usage: macos_ensure_defaults_string "com.apple.dock" "orientation" "left"
+macos_ensure_defaults_string() {
+  # Validate that all 3 parameters were provided
+  if [[ $# -ne 3 ]]; then
+    abort "macos_ensure_defaults_string requires 3 parameters: domain, key, value"
+  fi
+
+  local domain="$1"
+  local key="$2"
+  local value="$3"
+
+  # Get current value (redirect stderr to avoid error if key doesn't exist)
+  local current_value
+  current_value=$(defaults read "$domain" "$key" 2>/dev/null)
+
+  # Check if the current value matches the desired value
+  if [[ "$current_value" != "$value" ]]; then
+    # Set the value and echo message
+    ohai "Setting $domain $key to '$value'"
+    defaults write "$domain" "$key" -string "$value"
+  fi
+}
+
 # Invalidate sudo timestamp before exiting (if it wasn't active before).
 if [[ -x /usr/bin/sudo ]] && ! /usr/bin/sudo -n -v 2>/dev/null
 then
@@ -404,7 +432,9 @@ fi
 # Also sudo prints a warning message for no good reason
 cd "/usr" || exit 1
 
-####################################################################### script
+# =============================================================================
+# Script Start
+# =============================================================================
 
 # shellcheck disable=SC2016
 ohai 'Checking for `sudo` access (which may request your password)...'
@@ -693,6 +723,118 @@ Xcode.app or running:
 EOABORT
   )"
 fi
+
+USABLE_GIT=/usr/bin/git
+if [[ -n "${KYLDVS_ON_LINUX-}" ]]
+then
+  USABLE_GIT="$(find_tool git)"
+  if [[ -z "$(command -v git)" ]]
+  then
+    abort "$(
+      cat <<EOABORT
+  You must install Git before setting up.
+EOABORT
+    )"
+  fi
+  if [[ -z "${USABLE_GIT}" ]]
+  then
+    abort "$(
+      cat <<EOABORT
+  The version of Git that was found does not satisfy requirements for Setup.
+  Please install Git ${REQUIRED_GIT_VERSION} or newer and add it to your PATH.
+EOABORT
+    )"
+  fi
+  if [[ "${USABLE_GIT}" != /usr/bin/git ]]
+  then
+    export KYLDVS_GIT_PATH="${USABLE_GIT}"
+    ohai "Found Git: ${KYLDVS_GIT_PATH}"
+  fi
+fi
+
+if ! command -v curl >/dev/null
+then
+  abort "$(
+    cat <<EOABORT
+You must install cURL before setting up.
+EOABORT
+  )"
+elif [[ -n "${KYLDVS_ON_LINUX-}" ]]
+then
+  USABLE_CURL="$(find_tool curl)"
+  if [[ -z "${USABLE_CURL}" ]]
+  then
+    abort "$(
+      cat <<EOABORT
+The version of cURL that was found does not satisfy requirements for Homebrew.
+Please install cURL ${REQUIRED_CURL_VERSION} or newer and add it to your PATH.
+EOABORT
+    )"
+  elif [[ "${USABLE_CURL}" != /usr/bin/curl ]]
+  then
+    export KYLDVS_CURL_PATH="${USABLE_CURL}"
+    ohai "Found cURL: ${KYLDVS_CURL_PATH}"
+  fi
+fi
+
+# TODO: Linux support.
+if [[ -n "${KYLDVS_ON_MACOS-}" ]]
+then
+  echo
+  ohai "Setting up machine..."
+else
+  echo
+  abort "Linux not yet supported."
+fi
+
+# =============================================================================
+# Setup Start
+# =============================================================================
+
+(
+  cd "${KYLDVS_REPOSITORY}" >/dev/null || return
+
+  # we do it in four steps to avoid merge errors when reinstalling
+  execute "${USABLE_GIT}" "-c" "init.defaultBranch=main" "init" "--quiet"
+
+  # "git remote add" will fail if the remote is defined in the global config
+  execute "${USABLE_GIT}" "config" "remote.origin.url" "${KYLDVS_SETUP_GIT_REMOTE}"
+  execute "${USABLE_GIT}" "config" "remote.origin.fetch" "+refs/heads/*:refs/remotes/origin/*"
+  execute "${USABLE_GIT}" "config" "--bool" "fetch.prune" "true"
+
+  # ensure we don't munge line endings on checkout
+  execute "${USABLE_GIT}" "config" "--bool" "core.autocrlf" "false"
+
+  # make sure symlinks are saved as-is
+  execute "${USABLE_GIT}" "config" "--bool" "core.symlinks" "true"
+
+  if [[ -z "${NONINTERACTIVE-}" ]]
+  then
+    quiet_progress=("--quiet" "--progress")
+  else
+    quiet_progress=("--quiet")
+  fi
+  retry 5 "${USABLE_GIT}" "fetch" "${quiet_progress[@]}" "--force" "origin"
+  retry 5 "${USABLE_GIT}" "fetch" "${quiet_progress[@]}" "--force" "--tags" "origin"
+
+  execute "${USABLE_GIT}" "remote" "set-head" "origin" "--auto" >/dev/null
+
+  # TODO: Verify if this works.
+  execute "${USABLE_GIT}" "checkout" "--quiet" "--force" "-B" "main" "main"
+
+  # ===========================================================================
+  # Mac Settings via Defaults
+  # ===========================================================================
+
+  macos_ensure_defaults_string "com.apple.dock" "orientation" "left"
+
+  # Restart the dock to apply. (TODO: Prompt user?)
+  killall Dock
+
+) || exit 1
+
+ohai "Installation successful!"
+echo
 
 # Homebrew pre-requisites.
 # TODO: Install git.
