@@ -228,7 +228,7 @@ mac-defaults:
   # Dock on left.
   ensure_defaults "com.apple.dock" "orientation" "-string" "left"
   # Make icons smaller.
-  ensure_defaults "com.apple.dock" "tilesize" "-int" "36"
+  ensure_defaults "com.apple.dock" "tilesize" "-int" "42"
   # Auto-hide the Dock.
   ensure_defaults "com.apple.dock" "autohide" "-bool" "true"
   # Make the hide animation instant.

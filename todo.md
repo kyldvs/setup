@@ -13,6 +13,16 @@ Manual Steps I should try to automate:
   - [ ] (Accessibility) -> AeroSpace [true]
   - [ ] (Accessibility) -> borders [true]
 
+## Ice (window bar)
+
+- Launch ICE.
+- Grant it all the permissions.
+- Start at login.
+- Split mode.
+- Turn on border.
+  - Width: 2
+  - Color: #FF9300 or rgb(255, 147, 0)
+
 ## Brew Setups
 
 `zsh-autosuggestions`
