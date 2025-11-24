@@ -52,6 +52,9 @@ brew:
   # - https://www.alfredapp.com/
   brew install --cask alfred
 
+  # Top bar.
+  brew install --cask jordanbaird-ice
+
   # dockutil: Dock utility to manage macOS dock items.
   # - https://formulae.brew.sh/formula/dockutil
   # - https://github.com/kcrawford/dockutil
@@ -67,7 +70,6 @@ brew:
     eza \
     fd \
     felixkratz/formulae/borders \
-    felixkratz/formulae/sketchybar \
     ffmpeg \
     fzf \
     gh \
@@ -116,7 +118,6 @@ brew-services:
   # Start services.
   brew services start postgresql@17
   brew services start felixkratz/formulae/borders
-  brew services start felixkratz/formulae/sketchybar
 
 # Install Rust programming language.
 rust:
