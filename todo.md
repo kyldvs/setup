@@ -25,6 +25,17 @@ Manual Steps I should try to automate:
 - Disable inset.
 - Make sure aerospace paddings are all good.
 
+## Linearmouse
+
+- Launch linear mouse.
+- Probably need to grant permissions while launching.
+- Use these settings:
+  - (most other settings should be configured via linearmouse.json)
+  - General:
+    - Show in menu bar
+    - Start at login
+    - Show in dock
+
 ## Brew Setups
 
 `zsh-autosuggestions`

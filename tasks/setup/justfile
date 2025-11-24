@@ -65,6 +65,13 @@ brew:
   # Figma design app.
   brew install --cask figma
 
+  # Linear App
+  brew install --cask linear-linear
+
+  # Linear mouse app
+  # - https://github.com/linearmouse/linearmouse
+  brew install --cask linearmouse
+
   # dockutil: Dock utility to manage macOS dock items.
   # - https://formulae.brew.sh/formula/dockutil
   # - https://github.com/kcrawford/dockutil
