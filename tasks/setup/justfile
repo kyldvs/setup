@@ -80,15 +80,17 @@ mac-dock:
   dockutil --remove spacer-tiles --restart
 
 # Sets macOS defaults to desired values.
-mac-defaults:
+@mac-defaults:
   #!/usr/bin/env bash
   set -euo pipefail
+
+  echo "Setting macOS defaults..."
 
   # Usage: ensure_defaults "com.apple.dock" "orientation" -string "left"
   ensure_defaults() {
     # Validate that all 4 parameters were provided
     if [[ $# -ne 4 ]]; then
-      echo "ERROR: ensure_defaults_string requires 4 parameters: domain, key, type, value"
+      echo "ERROR: ensure_defaults requires 4 parameters: domain, key, type, value"
       exit 1
     fi
 
@@ -110,45 +112,45 @@ mac-defaults:
   }
 
   # Dock on left.
-  ensure_defaults "com.apple.dock" "orientation" -string "left"
+  ensure_defaults "com.apple.dock" "orientation" "string" "left"
   # Make icons smaller.
-  ensure_defaults "com.apple.dock" "tilesize" -int "36"
+  ensure_defaults "com.apple.dock" "tilesize" "int" "36"
   # Auto-hide the Dock.
-  ensure_defaults "com.apple.dock" "autohide" -bool "true"
+  ensure_defaults "com.apple.dock" "autohide" "bool" "true"
   # Make the hide animation instant.
-  ensure_defaults "com.apple.dock" "autohide-time-modifier" -float "0"
+  ensure_defaults "com.apple.dock" "autohide-time-modifier" "float" "0"
   # Do not show recent applications.
-  ensure_defaults "com.apple.dock" "show-recents" -bool "false"
+  ensure_defaults "com.apple.dock" "show-recents" "bool" "false"
   # Reduce the minimize animation.
-  ensure_defaults "com.apple.dock" "mineffect" -string "scale"
+  ensure_defaults "com.apple.dock" "mineffect" "string" "scale"
   # Do not rearrange spaces automatically.
-  ensure_defaults "com.apple.dock" "mru-spaces" -bool "false"
+  ensure_defaults "com.apple.dock" "mru-spaces" "bool" "false"
 
   # Update screenshots save location.
   mkdir -p "~/Screenshots"
-  ensure_defaults "com.apple.screencapture" "location" -string "~/Screenshots"
+  ensure_defaults "com.apple.screencapture" "location" "string" "~/Screenshots"
   # Do not show thumbnail after taking screenshot.
-  ensure_defaults "com.apple.screencapture" "show-thumbnail" -bool "false"
+  ensure_defaults "com.apple.screencapture" "show-thumbnail" "bool" "false"
 
   # Show extensions in finder.
-  ensure_defaults "NSGlobalDomain" "AppleShowAllExtensions" -bool "true"
+  ensure_defaults "NSGlobalDomain" "AppleShowAllExtensions" "bool" "true"
   # Show hidden files in finder.
-  ensure_defaults "com.apple.finder" "AppleShowAllFiles" -bool "false"
+  ensure_defaults "com.apple.finder" "AppleShowAllFiles" "bool" "false"
   # Show path bar.
-  ensure_defaults "com.apple.finder" "ShowPathbar" -bool "true"
+  ensure_defaults "com.apple.finder" "ShowPathbar" "bool" "true"
   # Set columns as the default view.
-  ensure_defaults "com.apple.finder" "FXPreferredViewStyle" -string "clmv"
+  ensure_defaults "com.apple.finder" "FXPreferredViewStyle" "string" "clmv"
   # Sort folders first.
-  ensure_defaults "com.apple.finder" "_FXSortFoldersFirst" -bool "true"
+  ensure_defaults "com.apple.finder" "_FXSortFoldersFirst" "bool" "true"
   # Do not show warning when changing file extension.
-  ensure_defaults "com.apple.finder" "FXEnableExtensionChangeWarning" -bool "false"
+  ensure_defaults "com.apple.finder" "FXEnableExtensionChangeWarning" "bool" "false"
   # Save locally by default, not in cloud.
-  ensure_defaults "NSGlobalDomain" "NSDocumentSaveNewDocumentsToCloud" -bool "false"
+  ensure_defaults "NSGlobalDomain" "NSDocumentSaveNewDocumentsToCloud" "bool" "false"
   # Hide all icons on desktop.
-  ensure_defaults "com.apple.finder" "CreateDesktop" -bool "false"
+  ensure_defaults "com.apple.finder" "CreateDesktop" "bool" "false"
 
   # Disable apple intelligence. Needs a restart to take effect.
-  ensure_defaults "com.apple.CloudSubscriptionFeatures.optIn" "545129924" -bool "false"
+  ensure_defaults "com.apple.CloudSubscriptionFeatures.optIn" "545129924" "bool" "false"
 
   # Restart services.
   killall Dock
