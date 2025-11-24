@@ -125,15 +125,25 @@ rust:
   set -euo pipefail
 
   # Install rust via rustup.
-  curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+  # Check if rustup is already installed.
+  if command -v rustup &> /dev/null; then
+    echo "> rustup is already installed, skipping."
+  else
+    curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+  fi
 
 # Install nvm (Node Version Manager).
 nvm:
   #!/usr/bin/env bash
   set -euo pipefail
 
-  # Set profile to null to prevent nvm from trying to modify shell profile.
-  PROFILE=/dev/null bash -c 'curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.3/install.sh | bash'
+  # Check if nvm is installed
+  if [ -f "$HOME/.nvm/nvm.sh" ]; then
+    echo "> nvm is already installed, skipping."
+  else
+    # Set profile to null to prevent nvm from trying to modify shell profile.
+    PROFILE=/dev/null bash -c 'curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.3/install.sh | bash'
+  fi
 
 # Manual steps needed for arc.
 arc:
