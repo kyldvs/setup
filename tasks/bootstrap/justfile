@@ -12,10 +12,10 @@ shellenv *args:
   set -euo pipefail
 
   cat <<EOS
-export PATH="${KYLDVS_BIN}:\${PATH}"
-export KYLDVS_PREFIX="${KYLDVS_PREFIX}"
-export KYLDVS_REPOSITORY="${KYLDVS_REPOSITORY}"
-EOS
+  export PATH="${KYLDVS_BIN}:\${PATH}"
+  export KYLDVS_PREFIX="${KYLDVS_PREFIX}"
+  export KYLDVS_REPOSITORY="${KYLDVS_REPOSITORY}"
+  EOS
 
 # Pulls the latest changes to 'kyldvs' from github.
 sync *args:
