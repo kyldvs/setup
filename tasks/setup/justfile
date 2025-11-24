@@ -88,7 +88,8 @@ mac-defaults:
   ensure_defaults() {
     # Validate that all 4 parameters were provided
     if [[ $# -ne 4 ]]; then
-      abort "ensure_defaults_string requires 4 parameters: domain, key, type, value"
+      echo "ERROR: ensure_defaults_string requires 4 parameters: domain, key, type, value"
+      exit 1
     fi
 
     local domain="$1"
@@ -103,7 +104,7 @@ mac-defaults:
     # Check if the current value matches the desired value
     if [[ "$current_value" != "$value" ]]; then
       # Set the value and echo message
-      ohai "Setting $domain $key to '$value'"
+      echo "--> Setting $domain $key to '$value'"
       defaults write "$domain" "$key" "$type" "$value"
     fi
   }
