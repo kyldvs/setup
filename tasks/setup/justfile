@@ -23,6 +23,10 @@ brew:
   # JetBrains Mono Nerd Font.
   brew install --cask font-jetbrains-mono-nerd-font
 
+  # Tiling window manager.
+  # - https://github.com/nikitabobko/AeroSpace
+  brew install --cask nikitabobko/tap/aerospace
+
   # dockutil: Dock utility to manage macOS dock items.
   # - https://formulae.brew.sh/formula/dockutil
   # - https://github.com/kcrawford/dockutil
@@ -36,6 +40,8 @@ brew:
     dockutil \
     eza \
     fd \
+    felixkratz/formulae/borders \
+    felixkratz/formulae/sketchybar \
     ffmpeg \
     fzf \
     gh \
