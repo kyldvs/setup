@@ -105,8 +105,6 @@ mac-defaults:
     fi
   }
 
-  echo "Function defined..."
-
   # Dock on left.
   ensure_defaults "com.apple.dock" "orientation" "-string" "left"
   # Make icons smaller.
@@ -122,15 +120,11 @@ mac-defaults:
   # Do not rearrange spaces automatically.
   ensure_defaults "com.apple.dock" "mru-spaces" "-bool" "false"
 
-  echo "Dock defaults set..."
-
   # Update screenshots save location.
   mkdir -p "~/Screenshots"
   ensure_defaults "com.apple.screencapture" "location" "-string" "~/Screenshots"
   # Do not show thumbnail after taking screenshot.
   ensure_defaults "com.apple.screencapture" "show-thumbnail" "-bool" "false"
-
-  echo "Screenshot defaults set..."
 
   # Show extensions in finder.
   ensure_defaults "NSGlobalDomain" "AppleShowAllExtensions" "-bool" "true"
@@ -152,9 +146,11 @@ mac-defaults:
   # Disable apple intelligence. Needs a restart to take effect.
   ensure_defaults "com.apple.CloudSubscriptionFeatures.optIn" "545129924" "-bool" "false"
 
-  echo "All defaults set..."
+  echo "All defaults set, restarting affected services"
 
   # Restart services.
   killall Dock
   killall Finder
   killall SystemUIServer
+
+  echo "Done. Some changes may require a logout/restart to take effect."
