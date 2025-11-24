@@ -135,7 +135,10 @@ docker:
 
   # Install Docker Desktop if not installed.
   if [ ! -d "/Applications/Docker.app" ]; then
-    sudo hdiutil attach Docker.dmg
+    # Download to ./cache/downloads/Docker.dmg
+    mkdir -p ./cache/downloads
+    curl -LO https://desktop.docker.com/mac/main/arm64/Docker.dmg -o ./cache/downloads/Docker.dmg
+    sudo hdiutil attach ./cache/downloads/Docker.dmg
     sudo /Volumes/Docker/Docker.app/Contents/MacOS/install --accept-license
     sudo hdiutil detach /Volumes/Docker
   else
