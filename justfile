@@ -32,3 +32,9 @@ _default: help
 [no-exit-message]
 @dev *args:
   just -d `pwd` -f "tasks/dev/justfile" -- "$@"
+
+# Install different tools and packages.
+[group("tasks")]
+[no-exit-message]
+@install *args:
+  just -d `pwd` -f "tasks/install/justfile" -- "$@"

@@ -1,0 +1,16 @@
+# --- Setup ---
+
+self := "install"
+import "../prelude/task/justfile"
+_default: help
+
+# --- Tasks ---
+
+# Install desired brew packages.
+brew:
+  #!/usr/bin/env bash
+
+  set -euo pipefail
+
+  # Warp terminal.
+  brew install --cask warp
