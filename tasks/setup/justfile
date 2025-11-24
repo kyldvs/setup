@@ -20,10 +20,61 @@ brew:
   # Warp terminal.
   brew install --cask warp
 
-  # Dock utility to manage macOS dock items.
+  # JetBrains Mono Nerd Font.
+  brew install --cask font-jetbrains-mono-nerd-font
+
+  # dockutil: Dock utility to manage macOS dock items.
   # - https://formulae.brew.sh/formula/dockutil
   # - https://github.com/kcrawford/dockutil
-  brew install dockutil
+
+  # Entire list of normal brew packages.
+  brew install \
+    bat \
+    cmake \
+    coreutils \
+    cowsay \
+    dockutil \
+    eza \
+    fd \
+    ffmpeg \
+    fzf \
+    gh \
+    glow \
+    go \
+    goose \
+    hashicorp/tap/terraform \
+    helm \
+    htop \
+    imagemagick \
+    jq \
+    kind \
+    livekit-cli \
+    md5sha1sum \
+    mosh \
+    neofetch \
+    neovim \
+    opentofu \
+    postgresql@17 \
+    pulumi/tap/pulumi \
+    python@3.13 \
+    redis \
+    ripgrep \
+    ruff \
+    shellcheck \
+    steveyegge/beads/bd \
+    stow \
+    the_silver_searcher \
+    tilt-dev/tap/ctlptl \
+    tilt-dev/tap/tilt \
+    tmux \
+    tree \
+    uv \
+    wget \
+    withgraphite/tap/graphite \
+    yq \
+    zoxide \
+    zsh-autosuggestions \
+    zsh-syntax-highlighting
 
 # Manual steps needed for arc.
 arc:
