@@ -44,6 +44,9 @@ brew:
   # JetBrains Mono Nerd Font.
   brew install --cask font-jetbrains-mono-nerd-font
 
+  # Warp terminal.
+  brew install --cask visual-studio-code
+
   # Tiling window manager.
   # - https://github.com/nikitabobko/AeroSpace
   brew install --cask nikitabobko/tap/aerospace
