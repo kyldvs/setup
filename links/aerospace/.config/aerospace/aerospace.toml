@@ -13,10 +13,10 @@ accordion-padding = 0
 [gaps]
 inner.horizontal = 12
 inner.vertical = 12
-outer.left = 16
-outer.bottom = 16
-outer.top = 8
-outer.right = 16
+outer.left = 4
+outer.bottom = 6
+outer.top = 12
+outer.right = 4
 
 # =============================================================================
 # Keybindings (main)
