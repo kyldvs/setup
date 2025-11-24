@@ -46,28 +46,36 @@ mac-dock:
   set -euo pipefail
 
   # TODO: Check that dockutil is installed. Say to use brew install if not.
+  DOCK_ITEMS=$(dockutil --list | awk -F'file:///' '{gsub(/[[:space:]]+$/, "", $1); print $1}')
+
+  try_remove_dock_item() {
+    if echo "$DOCK_ITEMS" | grep -Fxq "$1"; then
+      dockutil --remove "$1" --no-restart
+    fi
+  }
 
   # Keep: Finder, System Settings, Downloads, Trash.
-  dockutil --remove "Launchpad" --no-restart
-  dockutil --remove "Messages" --no-restart
-  dockutil --remove "Safari" --no-restart
-  dockutil --remove "Mail" --no-restart
-  dockutil --remove "Maps" --no-restart
-  dockutil --remove "Photos" --no-restart
-  dockutil --remove "FaceTime" --no-restart
-  dockutil --remove "Calendar" --no-restart
-  dockutil --remove "Contacts" --no-restart
-  dockutil --remove "Reminders" --no-restart
-  dockutil --remove "Notes" --no-restart
-  dockutil --remove "Freeform" --no-restart
-  dockutil --remove "TV" --no-restart
-  dockutil --remove "Music" --no-restart
-  dockutil --remove "News" --no-restart
-  dockutil --remove "Keynote" --no-restart
-  dockutil --remove "Numbers" --no-restart
-  dockutil --remove "Pages" --no-restart
-  dockutil --remove "App Store" --no-restart
-  # Finally; do a restart.
+  try_remove_dock_item "Launchpad"
+  try_remove_dock_item "Messages"
+  try_remove_dock_item "Safari"
+  try_remove_dock_item "Mail"
+  try_remove_dock_item "Maps"
+  try_remove_dock_item "Photos"
+  try_remove_dock_item "FaceTime"
+  try_remove_dock_item "Calendar"
+  try_remove_dock_item "Contacts"
+  try_remove_dock_item "Reminders"
+  try_remove_dock_item "Notes"
+  try_remove_dock_item "Freeform"
+  try_remove_dock_item "TV"
+  try_remove_dock_item "Music"
+  try_remove_dock_item "News"
+  try_remove_dock_item "Keynote"
+  try_remove_dock_item "Numbers"
+  try_remove_dock_item "Pages"
+  try_remove_dock_item "App Store"
+
+  # Finally, remove spacer tiles and do a restart.
   dockutil --remove spacer-tiles --restart
 
 mac-defaults:
