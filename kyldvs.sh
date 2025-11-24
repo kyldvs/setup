@@ -9,4 +9,4 @@ export KYLDVS_REPOSITORY="${KYLDVS_PREFIX}/setup"
 export KYLDVS_BIN="${KYLDVS_PREFIX}/bin"
 
 # Defer to Just for all commands.
-just -d "$KYLDVS_REPOSITORY" -f "$KYLDVS_REPOSITORY/justfile" "$@"
+just -d "$KYLDVS_REPOSITORY" -f "$KYLDVS_REPOSITORY/justfile" -- "$@"
