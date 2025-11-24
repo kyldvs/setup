@@ -86,7 +86,7 @@ mac-dock:
 
   echo "Setting macOS defaults..."
 
-  # Usage: ensure_defaults "com.apple.dock" "orientation" -string "left"
+  # Usage: ensure_defaults "com.apple.dock" "orientation" "string" "left"
   ensure_defaults() {
     # Validate that all 4 parameters were provided
     if [[ $# -ne 4 ]]; then
@@ -107,7 +107,7 @@ mac-dock:
     if [[ "$current_value" != "$value" ]]; then
       # Set the value and echo message
       echo "--> Setting $domain $key to '$value'"
-      defaults write "$domain" "$key" "$type" "$value"
+      defaults write "$domain" "$key" "-$type" "$value"
     fi
   }
 
