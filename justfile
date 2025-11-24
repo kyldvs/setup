@@ -25,16 +25,16 @@ _default: help
 [group("tasks")]
 [no-exit-message]
 @bootstrap *args:
-  just -d `pwd` -f "tasks/bootstrap/justfile" -- "$@"
+  just -d `pwd` -f "tasks/bootstrap/justfile" "$@"
 
 # Tasks for developing the kyldvs repo itself.
 [group("tasks")]
 [no-exit-message]
 @dev *args:
-  just -d `pwd` -f "tasks/dev/justfile" -- "$@"
+  just -d `pwd` -f "tasks/dev/justfile" "$@"
 
 # Commands to setup a fresh system.
 [group("tasks")]
 [no-exit-message]
 @setup *args:
-  just -d `pwd` -f "tasks/setup/justfile" -- "$@"
+  just -d `pwd` -f "tasks/setup/justfile" "$@"
