@@ -12,5 +12,11 @@ brew:
 
   set -euo pipefail
 
+  # Bitwarden password manager.
+  brew install --cask bitwarden
+
+  # Arc browser.
+  brew install --cask arc
+
   # Warp terminal.
   brew install --cask warp
