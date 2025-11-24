@@ -22,6 +22,8 @@ Manual Steps I should try to automate:
 - Turn on border.
   - Width: 2
   - Color: #FF9300 or rgb(255, 147, 0)
+- Disable inset.
+- Make sure aerospace paddings are all good.
 
 ## Brew Setups
 
