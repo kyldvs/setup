@@ -21,6 +21,13 @@ _default: help
 
 # --- Tasks ---
 
+# Tasks referenced in the bootstrap script, generally for setup.
+[group("tasks")]
+[no-exit-message]
+@bootstrap *args:
+  just -d `pwd` -f "tasks/bootstrap/justfile" "$@"
+
+# Tasks for developing the kyldvs repo itself.
 [group("tasks")]
 [no-exit-message]
 @dev *args:
