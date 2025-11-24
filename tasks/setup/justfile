@@ -137,7 +137,7 @@ docker:
   if [ ! -d "/Applications/Docker.app" ]; then
     # Download to ./cache/downloads/Docker.dmg
     mkdir -p ./cache/downloads
-    curl -LO https://desktop.docker.com/mac/main/arm64/Docker.dmg -o ./cache/downloads/Docker.dmg
+    curl -L -o ./cache/downloads/Docker.dmg https://desktop.docker.com/mac/main/arm64/Docker.dmg
     sudo hdiutil attach ./cache/downloads/Docker.dmg
     sudo /Volumes/Docker/Docker.app/Contents/MacOS/install --accept-license
     sudo hdiutil detach /Volumes/Docker
@@ -267,8 +267,8 @@ mac-defaults:
   ensure_defaults "com.apple.dock" "mru-spaces" "-bool" "false"
 
   # Update screenshots save location.
-  mkdir -p "~/Screenshots"
-  ensure_defaults "com.apple.screencapture" "location" "-string" "~/Screenshots"
+  mkdir -p "$HOME/Screenshots"
+  ensure_defaults "com.apple.screencapture" "location" "-string" "$HOME/Screenshots"
   # Do not show thumbnail after taking screenshot.
   ensure_defaults "com.apple.screencapture" "show-thumbnail" "-bool" "false"
 
