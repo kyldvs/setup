@@ -824,7 +824,7 @@ fi
   # embedded here (?)
 
   # Link kyldvs.sh to PREFIX/bin folder.
-  execute "/bin/ln" "-sf" "${KYLDVS_REPOSITORY}/mac/kyldvs.sh" "${KYLDVS_PREFIX}/bin/kyldvs"
+  execute "/bin/ln" "-sf" "${KYLDVS_REPOSITORY}/kyldvs.sh" "${KYLDVS_PREFIX}/bin/kyldvs"
 
 
   if ! command -v brew >/dev/null

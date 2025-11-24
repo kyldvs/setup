@@ -1,0 +1,11 @@
+# --- Setup ---
+
+self := "dev"
+import "../prelude/task/justfile"
+_default: help
+
+# --- Tasks ---
+
+# Sample, hello command.
+hello:
+  echo "Hello, Dev!"
