@@ -13,6 +13,7 @@ all:
   just setup mac-dock
   just setup mac-defaults
   just setup nvm
+  just setup rust
   just setup arc
 
 # Setup home directory, linking appropriate dotfiles.
@@ -46,6 +47,10 @@ brew:
   # Tiling window manager.
   # - https://github.com/nikitabobko/AeroSpace
   brew install --cask nikitabobko/tap/aerospace
+
+  # Alfred productivity app.
+  # - https://www.alfredapp.com/
+  brew install --cask alfred
 
   # dockutil: Dock utility to manage macOS dock items.
   # - https://formulae.brew.sh/formula/dockutil
@@ -112,6 +117,14 @@ brew-services:
   brew services start postgresql@17
   brew services start felixkratz/formulae/borders
   brew services start felixkratz/formulae/sketchybar
+
+# Install Rust programming language.
+rust:
+  #!/usr/bin/env bash
+  set -euo pipefail
+
+  # Install rust via rustup.
+  curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
 
 # Install nvm (Node Version Manager).
 nvm:
