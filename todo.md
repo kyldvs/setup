@@ -2,6 +2,10 @@
 
 Manual Steps I should try to automate:
 
+# Figure out
+
+- [ ] NVM
+
 # Mac
 
 - [ ] Settings -> Displays -> More Space (1800x1169)

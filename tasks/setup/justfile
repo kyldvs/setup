@@ -6,6 +6,23 @@ _default: help
 
 # --- Tasks ---
 
+all:
+  just setup brew
+  just setup home
+  just setup brew-services
+  just setup mac-dock
+  just setup mac-defaults
+  just setup nvm
+  just setup arc
+
+# Setup home directory, linking appropriate dotfiles.
+home:
+  #!/usr/bin/env bash
+  set -euo pipefail
+
+  # Stow dotfiles.
+  ls -A links | grep -v "^\.\+$" | xargs stow -d ./links -t "$HOME"
+
 # Install desired brew packages.
 brew:
   #!/usr/bin/env bash
@@ -34,6 +51,7 @@ brew:
   # Entire list of normal brew packages.
   brew install \
     bat \
+    bufbuild/buf/buf \
     cmake \
     coreutils \
     cowsay \
@@ -41,7 +59,6 @@ brew:
     eza \
     fd \
     felixkratz/formulae/borders \
-    felixkratz/formulae/sketchybar \
     ffmpeg \
     fzf \
     gh \
@@ -81,6 +98,23 @@ brew:
     zoxide \
     zsh-autosuggestions \
     zsh-syntax-highlighting
+
+# Start desired brew services.
+brew-services:
+  #!/usr/bin/env bash
+  set -euo pipefail
+
+  # Start services.
+  brew services start postgresql@17
+  brew services start felixkratz/formulae/borders
+
+# Install nvm (Node Version Manager).
+nvm:
+  #!/usr/bin/env bash
+  set -euo pipefail
+
+  # Set profile to null to prevent nvm from trying to modify shell profile.
+  PROFILE=/dev/null bash -c 'curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.3/install.sh | bash'
 
 # Manual steps needed for arc.
 arc:
