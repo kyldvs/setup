@@ -237,6 +237,8 @@ mac-defaults:
   #!/usr/bin/env bash
   set -euo pipefail
 
+  # See: https://macos-defaults.com/
+
   echo "Setting macOS defaults..."
 
   # Usage: ensure_defaults "com.apple.dock" "orientation" "-string" "left"

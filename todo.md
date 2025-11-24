@@ -13,6 +13,10 @@ Manual Steps I should try to automate:
   - [ ] (Accessibility) -> AeroSpace [true]
   - [ ] (Accessibility) -> borders [true]
 
+## Alfred.
+
+- Launch alfred and figure out correct settings.
+
 ## Ice (window bar)
 
 - Launch ICE.
@@ -65,3 +69,9 @@ export CPPFLAGS="-I/opt/homebrew/opt/postgresql@17/include"
 # To start service now and at login:
 brew services start postgresql@17
 ```
+
+## Ideas:
+
+- Open system settings automatically:
+  - https://www.tweaking4all.com/forum/macos-x-software/macos-how-to-open-system-preferences-from-terminal/
+  - `open "x-apple.systempreferences:com.apple.preference.security?Privacy"`
