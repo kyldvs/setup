@@ -86,7 +86,7 @@ mac-defaults:
 
   echo "Setting macOS defaults..."
 
-  # Usage: ensure_defaults "com.apple.dock" "orientation" "string" "left"
+  # Usage: ensure_defaults "com.apple.dock" "orientation" "-string" "left"
   ensure_defaults() {
     local domain="$1"
     local key="$2"
@@ -95,62 +95,62 @@ mac-defaults:
 
     # Get current value (redirect stderr to avoid error if key does not exist)
     local current_value
-    current_value=$(defaults read "$domain" "$key")
+    current_value=$(defaults read "$domain" "$key" 2>/dev/null || echo "null")
 
     # Check if the current value matches the desired value
     if [[ "$current_value" != "$value" ]]; then
       # Set the value and echo message
       echo "--> Setting $domain $key to '$value'"
-      defaults write "$domain" "$key" "-$type" "$value"
+      defaults write "$domain" "$key" "$type" "$value"
     fi
   }
 
   echo "Function defined..."
 
   # Dock on left.
-  ensure_defaults "com.apple.dock" "orientation" "string" "left"
+  ensure_defaults "com.apple.dock" "orientation" "-string" "left"
   # Make icons smaller.
-  ensure_defaults "com.apple.dock" "tilesize" "int" "36"
+  ensure_defaults "com.apple.dock" "tilesize" "-int" "36"
   # Auto-hide the Dock.
-  ensure_defaults "com.apple.dock" "autohide" "bool" "true"
+  ensure_defaults "com.apple.dock" "autohide" "-bool" "true"
   # Make the hide animation instant.
-  ensure_defaults "com.apple.dock" "autohide-time-modifier" "float" "0"
+  ensure_defaults "com.apple.dock" "autohide-time-modifier" "-float" "0"
   # Do not show recent applications.
-  ensure_defaults "com.apple.dock" "show-recents" "bool" "false"
+  ensure_defaults "com.apple.dock" "show-recents" "-bool" "false"
   # Reduce the minimize animation.
-  ensure_defaults "com.apple.dock" "mineffect" "string" "scale"
+  ensure_defaults "com.apple.dock" "mineffect" "-string" "scale"
   # Do not rearrange spaces automatically.
-  ensure_defaults "com.apple.dock" "mru-spaces" "bool" "false"
+  ensure_defaults "com.apple.dock" "mru-spaces" "-bool" "false"
 
   echo "Dock defaults set..."
 
   # Update screenshots save location.
   mkdir -p "~/Screenshots"
-  ensure_defaults "com.apple.screencapture" "location" "string" "~/Screenshots"
+  ensure_defaults "com.apple.screencapture" "location" "-string" "~/Screenshots"
   # Do not show thumbnail after taking screenshot.
-  ensure_defaults "com.apple.screencapture" "show-thumbnail" "bool" "false"
+  ensure_defaults "com.apple.screencapture" "show-thumbnail" "-bool" "false"
 
   echo "Screenshot defaults set..."
 
   # Show extensions in finder.
-  ensure_defaults "NSGlobalDomain" "AppleShowAllExtensions" "bool" "true"
+  ensure_defaults "NSGlobalDomain" "AppleShowAllExtensions" "-bool" "true"
   # Show hidden files in finder.
-  ensure_defaults "com.apple.finder" "AppleShowAllFiles" "bool" "false"
+  ensure_defaults "com.apple.finder" "AppleShowAllFiles" "-bool" "false"
   # Show path bar.
-  ensure_defaults "com.apple.finder" "ShowPathbar" "bool" "true"
+  ensure_defaults "com.apple.finder" "ShowPathbar" "-bool" "true"
   # Set columns as the default view.
-  ensure_defaults "com.apple.finder" "FXPreferredViewStyle" "string" "clmv"
+  ensure_defaults "com.apple.finder" "FXPreferredViewStyle" "-string" "clmv"
   # Sort folders first.
-  ensure_defaults "com.apple.finder" "_FXSortFoldersFirst" "bool" "true"
+  ensure_defaults "com.apple.finder" "_FXSortFoldersFirst" "-bool" "true"
   # Do not show warning when changing file extension.
-  ensure_defaults "com.apple.finder" "FXEnableExtensionChangeWarning" "bool" "false"
+  ensure_defaults "com.apple.finder" "FXEnableExtensionChangeWarning" "-bool" "false"
   # Save locally by default, not in cloud.
-  ensure_defaults "NSGlobalDomain" "NSDocumentSaveNewDocumentsToCloud" "bool" "false"
+  ensure_defaults "NSGlobalDomain" "NSDocumentSaveNewDocumentsToCloud" "-bool" "false"
   # Hide all icons on desktop.
-  ensure_defaults "com.apple.finder" "CreateDesktop" "bool" "false"
+  ensure_defaults "com.apple.finder" "CreateDesktop" "-bool" "false"
 
   # Disable apple intelligence. Needs a restart to take effect.
-  ensure_defaults "com.apple.CloudSubscriptionFeatures.optIn" "545129924" "bool" "false"
+  ensure_defaults "com.apple.CloudSubscriptionFeatures.optIn" "545129924" "-bool" "false"
 
   echo "All defaults set..."
 
