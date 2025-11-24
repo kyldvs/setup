@@ -9,6 +9,9 @@ Manual Steps I should try to automate:
 # Mac
 
 - [ ] Settings -> Displays -> More Space (1800x1169)
+- [ ] Launch AeroSpace
+  - [ ] (Accessibility) -> AeroSpace [true]
+  - [ ] (Accessibility) -> borders [true]
 
 ## Brew Setups
 

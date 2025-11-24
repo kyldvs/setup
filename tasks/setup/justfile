@@ -34,6 +34,9 @@ brew:
   # Arc browser.
   brew install --cask arc
 
+  # WezTerm terminal.
+  brew install --cask wezterm
+
   # Warp terminal.
   brew install --cask warp
 
@@ -59,6 +62,7 @@ brew:
     eza \
     fd \
     felixkratz/formulae/borders \
+    felixkratz/formulae/sketchybar \
     ffmpeg \
     fzf \
     gh \
@@ -107,6 +111,7 @@ brew-services:
   # Start services.
   brew services start postgresql@17
   brew services start felixkratz/formulae/borders
+  brew services start felixkratz/formulae/sketchybar
 
 # Install nvm (Node Version Manager).
 nvm:
