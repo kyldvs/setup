@@ -33,8 +33,8 @@ _default: help
 @dev *args:
   just -d `pwd` -f "tasks/dev/justfile" -- "$@"
 
-# Install different tools and packages.
+# Commands to setup a fresh system.
 [group("tasks")]
 [no-exit-message]
-@install *args:
-  just -d `pwd` -f "tasks/install/justfile" -- "$@"
+@setup *args:
+  just -d `pwd` -f "tasks/setup/justfile" -- "$@"
