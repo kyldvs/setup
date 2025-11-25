@@ -3,9 +3,39 @@
 This file provides guidance to Claude Code (claude.ai/code) when working with
 code in this repository.
 
-## Task Management
+<!-- <beads-rules> -->
 
-BEFORE ANYTHING ELSE: run 'bd onboard' and follow the instructions.
+# Issue Tracking
+
+This project uses [bd (beads)](https://github.com/steveyegge/beads) for issue
+tracking. Use `bd` commands instead of markdown TODOs.
+
+## Quick Start
+
+- `bd ready` - Show issues ready to work (no blockers)
+- `bd create "Title" -t task` - Create new issue
+- `bd update <id> --status in_progress` - Claim work
+- `bd close <id>` - Mark complete
+
+## Issue Types
+
+- `bug` - Something broken
+- `feature` - New functionality
+- `task` - Work item
+- `epic` - Large feature with subtasks
+- `chore` - Maintenance
+
+## Priorities
+
+- `0` Critical, `1` High, `2` Medium (default), `3` Low, `4` Backlog
+
+## Rules
+
+- Use bd for ALL task tracking (no markdown TODOs)
+- Link discovered work with `--deps discovered-from:<id>`
+- Check `bd ready` before asking "what to work on"
+
+<!-- </beads-rules> -->
 
 ## Overview
 
