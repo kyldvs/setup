@@ -276,13 +276,14 @@ Workers (5 concurrent instances of security-reviewer):
 </when_to_use>
 
 <sonnet_haiku_orchestration>
-**Sonnet 4.5 + Haiku 4.5 orchestration**: Optimal cost/performance pattern.
+**Multi-tier orchestration**: Match model capability to task complexity.
 
-Research findings:
+Model capabilities:
+- Opus 4.5: Highest reasoning capability, now reasonably priced - use for complex orchestration
 - Sonnet 4.5: "Best model in the world for agents", exceptional at planning and validation
 - Haiku 4.5: "90% of Sonnet 4.5 performance", one of best coding models, fast and cost-efficient
 
-**Pattern**:
+**Standard pattern (Sonnet + Haiku)**:
 ```markdown
 1. Sonnet 4.5 (Orchestrator):
    - Analyzes task
@@ -302,7 +303,18 @@ Research findings:
    - Delivers final output
 ```
 
-**Cost/performance optimization**: Expensive Sonnet only for planning/validation, cheap Haiku for execution.
+**Complex pattern (Opus for highest-stakes workflows)**:
+```markdown
+1. Opus 4.5 (Strategic Orchestrator):
+   - Complex strategic planning
+   - Critical decision points
+   - High-stakes coordination
+
+2. Sonnet/Haiku Workers (based on task complexity)
+3. Opus 4.5 (Final Validator): Ensures strategic coherence
+```
+
+**Cost/performance optimization**: Match model to task - Opus for complex reasoning, Sonnet for standard coordination, Haiku for execution.
 </sonnet_haiku_orchestration>
 </orchestrator_worker>
 </pattern_catalog>
@@ -551,10 +563,11 @@ Heavy coordinator = bottleneck. Coordinator should route and synthesize, not do 
 <principle name="cost_optimization">
 **Use model tiers strategically**.
 
-- Planning/validation: Sonnet 4.5 (needs intelligence)
+- Complex planning/strategic decisions: Opus 4.5 (highest reasoning capability)
+- Standard planning/validation: Sonnet 4.5 (excellent agentic performance)
 - Execution of clear tasks: Haiku 4.5 (fast, cheap, still capable)
-- Highest stakes decisions: Sonnet 4.5
-- Bulk processing: Haiku 4.5
+- Highest stakes/critical security: Opus 4.5 (strongest reasoning for critical work)
+- Bulk processing: Haiku 4.5 (cost efficiency)
 </principle>
 </best_practices>
 

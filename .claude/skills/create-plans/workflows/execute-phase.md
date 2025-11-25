@@ -622,7 +622,7 @@ Proceed with proposed change? (yes / different approach / defer)
 3. WAIT for user response
 4. If approved: implement, track as `[Rule 4 - Architectural] [description]`
 5. If different approach: discuss and implement
-6. If deferred: log to ISSUES.md, continue without change
+6. If deferred: create beads issue with `bd create --type=task --label=draft`, continue without change
 
 **User decision required.** These changes affect system design.
 
@@ -632,7 +632,7 @@ Proceed with proposed change? (yes / different approach / defer)
 
 **Trigger:** Improvement that would enhance code but isn't essential now
 
-**Action:** Add to .planning/ISSUES.md automatically, continue task
+**Action:** Create beads issue with `bd create --type=task --label=draft`, continue task
 
 **Examples:**
 - Performance optimization (works correctly, just slower than ideal)
@@ -645,30 +645,24 @@ Proceed with proposed change? (yes / different approach / defer)
 - Accessibility enhancements beyond minimum
 
 **Process:**
-1. Create .planning/ISSUES.md if doesn't exist (use template)
-2. Add entry with ISS-XXX number (auto-increment)
-3. Brief notification: `📋 Logged enhancement: [brief] (ISS-XXX)`
+1. Create beads issue: `bd create --title="[Brief description]" --type=task --label=draft`
+2. Include in body: Discovered context, type, description, impact, effort, suggested phase
+3. Brief notification: `📋 Created beads issue: [brief] (beads-XXX)`
 4. Continue task without implementing
 
-**Template for ISSUES.md:**
-```markdown
-# Project Issues Log
+**Example:**
+```bash
+bd create --title="Add connection pooling for Redis" --type=task --label=draft
+```
 
-Enhancements discovered during execution. Not critical - address in future phases.
-
-## Open Enhancements
-
-### ISS-001: [Brief description]
-- **Discovered:** Phase [X] Plan [Y] Task [Z] (YYYY-MM-DD)
-- **Type:** [Performance / Refactoring / UX / Testing / Documentation / Accessibility]
-- **Description:** [What could be improved and why it would help]
-- **Impact:** Low (works correctly, this would enhance)
-- **Effort:** [Quick / Medium / Substantial]
-- **Suggested phase:** [Phase number or "Future"]
-
-## Closed Enhancements
-
-[Moved here when addressed]
+Issue body:
+```
+**Discovered:** Phase 2 Plan 3 Task 6 (2025-11-23)
+**Type:** Performance
+**Description:** Redis client creates new connection per request. Connection pooling would reduce latency.
+**Impact:** Low (works correctly, ~20ms overhead per request)
+**Effort:** Medium (2-3 hours)
+**Suggested phase:** Phase 5 (Performance optimization)
 ```
 
 **No user permission needed.** Logging for future consideration.
@@ -679,7 +673,7 @@ Enhancements discovered during execution. Not critical - address in future phase
 
 1. **If Rule 4 applies** → STOP and ask (architectural decision)
 2. **If Rules 1-3 apply** → Fix automatically, track for Summary
-3. **If Rule 5 applies** → Log to ISSUES.md, continue
+3. **If Rule 5 applies** → Create beads issue, continue
 4. **If genuinely unsure which rule** → Apply Rule 4 (ask user)
 
 **Edge case guidance:**
@@ -751,10 +745,10 @@ None - plan executed exactly as written.
 
 ### Deferred Enhancements
 
-Logged to .planning/ISSUES.md for future consideration:
-- ISS-001: Refactor UserService into smaller modules (discovered in Task 3)
-- ISS-002: Add connection pooling for Redis (discovered in Task 6)
-- ISS-003: Improve error messages for validation failures (discovered in Task 2)
+Created as beads issues for future consideration:
+- beads-001: Refactor UserService into smaller modules (discovered in Task 3)
+- beads-002: Add connection pooling for Redis (discovered in Task 6)
+- beads-003: Improve error messages for validation failures (discovered in Task 2)
 
 ---
 

@@ -84,7 +84,7 @@ These improve quality - flag as recommendations:
 
 **model_selection**:
 - Is model choice appropriate for task complexity?
-- Guidance: Simple/fast → Haiku, Complex/critical → Sonnet, Highest capability → Opus
+- Guidance: Simple/fast → Haiku, Standard → Sonnet, Complex/critical → Opus (now reasonably priced)
 
 **success_criteria**:
 - Does prompt define what success looks like?

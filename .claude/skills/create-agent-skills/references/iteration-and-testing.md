@@ -165,7 +165,7 @@ Sonnet benefits from:
 </sonnet_testing>
 
 <opus_testing>
-**Claude Opus** (powerful reasoning)
+**Claude Opus 4.5** (highest reasoning capability)
 
 Questions to ask:
 - Does the skill avoid over-explaining?
@@ -173,11 +173,13 @@ Questions to ask:
 - Are constraints clear?
 - Is context minimal but sufficient?
 
-Opus benefits from:
+Opus 4.5 benefits from:
 - Concise instructions
 - Principles over procedures
 - High degrees of freedom
 - Trust in reasoning capabilities
+
+With Opus 4.5's reasonable pricing, use it as the primary choice for complex reasoning tasks requiring the highest capability.
 </opus_testing>
 
 <balancing_across_models>

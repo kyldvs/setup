@@ -82,7 +82,7 @@ Plans are guides, not straitjackets. Real development always involves discoverie
 2. **Auto-add missing critical** - Security/correctness gaps → add immediately, document
 3. **Auto-fix blockers** - Can't proceed → fix immediately, document
 4. **Ask about architectural** - Major structural changes → stop and ask user
-5. **Log enhancements** - Nice-to-haves → auto-log to ISSUES.md, continue
+5. **Log enhancements** - Nice-to-haves → create beads issue with `bd create --type=task --label=draft`, continue
 
 **No user intervention needed for Rules 1-3, 5.** Only Rule 4 (architectural) requires user decision.
 
@@ -451,7 +451,7 @@ All in `templates/`:
 | research-prompt.md | Research prompt (RESEARCH.md) |
 | summary.md | Phase outcome (SUMMARY.md) with deviations |
 | milestone.md | Milestone entry for MILESTONES.md |
-| issues.md | Deferred enhancements log (ISSUES.md) |
+| issues.md | Beads workflow for deferred enhancements |
 | continue-here.md | Context handoff format |
 </templates_index>
 

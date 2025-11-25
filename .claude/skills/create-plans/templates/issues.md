@@ -1,17 +1,14 @@
-# ISSUES.md Template
+# Deferred Enhancements with Beads
 
-This file is auto-created when Rule 5 (Log non-critical enhancements) is first triggered during execution.
+When Rule 5 (Log non-critical enhancements) is triggered during execution, use beads to track the enhancement.
 
-Location: `.planning/ISSUES.md`
+## Creating Deferred Enhancement Issues
 
-```markdown
-# Project Issues Log
+```bash
+bd create --title="[Brief description]" --type=task --label=draft
+```
 
-Non-critical enhancements discovered during execution. Address in future phases when appropriate.
-
-## Open Enhancements
-
-### ISS-001: [Brief description]
+When prompted for the issue body, include:
 - **Discovered:** Phase [X] Plan [Y] Task [Z] (YYYY-MM-DD)
 - **Type:** [Performance / Refactoring / UX / Testing / Documentation / Accessibility]
 - **Description:** [What could be improved and why it would help]
@@ -19,73 +16,62 @@ Non-critical enhancements discovered during execution. Address in future phases 
 - **Effort:** [Quick (<1hr) / Medium (1-4hr) / Substantial (>4hr)]
 - **Suggested phase:** [Phase number where this makes sense, or "Future"]
 
-### ISS-002: Add connection pooling for Redis
-- **Discovered:** Phase 2 Plan 3 Task 6 (2025-11-23)
-- **Type:** Performance
-- **Description:** Redis client creates new connection per request. Connection pooling would reduce latency and handle connection failures better. Currently works but suboptimal under load.
-- **Impact:** Low (works correctly, ~20ms overhead per request)
-- **Effort:** Medium (2-3 hours - need to configure ioredis pool, test connection reuse)
-- **Suggested phase:** Phase 5 (Performance optimization)
+## Example
 
-### ISS-003: Refactor UserService into smaller modules
-- **Discovered:** Phase 1 Plan 2 Task 3 (2025-11-22)
-- **Type:** Refactoring
-- **Description:** UserService has grown to 400 lines with mixed concerns (auth, profile, settings). Would be cleaner as separate services (AuthService, ProfileService, SettingsService). Currently works but harder to test and reason about.
-- **Impact:** Low (works correctly, just organizational)
-- **Effort:** Substantial (4-6 hours - need to split, update imports, ensure no breakage)
-- **Suggested phase:** Phase 7 (Code health milestone)
-
-## Closed Enhancements
-
-### ISS-XXX: [Brief description]
-- **Status:** Resolved in Phase [X] Plan [Y] (YYYY-MM-DD)
-- **Resolution:** [What was done]
-- **Benefit:** [How it improved the codebase]
-
----
-
-**Summary:** [X] open, [Y] closed
-**Priority queue:** [List ISS numbers in priority order, or "Address as time permits"]
+```bash
+bd create --title="Add connection pooling for Redis" --type=task --label=draft
 ```
 
-## Usage Guidelines
+Issue body:
+```
+**Discovered:** Phase 2 Plan 3 Task 6 (2025-11-23)
+**Type:** Performance
+**Description:** Redis client creates new connection per request. Connection pooling would reduce latency and handle connection failures better. Currently works but suboptimal under load.
+**Impact:** Low (works correctly, ~20ms overhead per request)
+**Effort:** Medium (2-3 hours - need to configure ioredis pool, test connection reuse)
+**Suggested phase:** Phase 5 (Performance optimization)
+```
 
-**When issues are added:**
-- Auto-increment ISS numbers (ISS-001, ISS-002, etc.)
-- Always include discovery context (Phase/Plan/Task and date)
-- Be specific about impact and effort
-- Suggested phase helps with roadmap planning
+## Finding Deferred Issues
 
-**When issues are resolved:**
-- Move to "Closed Enhancements" section
-- Document resolution and benefit
-- Keeps history for reference
+```bash
+# List all draft issues (deferred enhancements)
+bd list --label=draft
 
-**Prioritization:**
-- Quick wins (Quick effort, visible benefit) → Earlier phases
-- Substantial refactors (Substantial effort, organizational benefit) → Dedicated "code health" phases
-- Nice-to-haves (Low impact, high effort) → "Future" or never
+# List all open tasks
+bd list --type=task --status=open
+```
 
-**Integration with roadmap:**
-- When planning new phases, scan ISSUES.md for relevant items
-- Can create phases specifically for addressing accumulated issues
+## Closing Resolved Issues
+
+When an enhancement is addressed in a later phase:
+
+```bash
+bd close <id> --reason="Resolved in Phase [X] Plan [Y]: [What was done]"
+```
+
+## Integration with Roadmap
+
+When planning new phases, check for deferred enhancements:
+
+```bash
+bd list --label=draft --status=open
+```
+
+Can create phases specifically for addressing accumulated issues:
 - Example: "Phase 8: Code Health - Address ISS-003, ISS-007, ISS-012"
 
-## Example: Issues Driving Phase Planning
+## Prioritization
 
-```markdown
-# Roadmap excerpt
+Use beads priority field:
+- `0` Critical - Quick wins with visible benefit → Earlier phases
+- `1` High - Substantial refactors with organizational benefit → Dedicated "code health" phases
+- `2` Medium (default) - Nice-to-haves
+- `3` Low - Low impact, high effort → "Future" or never
+- `4` Backlog - Address as time permits
 
-### Phase 6: Performance Optimization (Planned)
-
-**Milestone Goal:** Address performance issues discovered during v1.0 usage
-
-**Includes:**
-- ISS-002: Redis connection pooling (Medium effort)
-- ISS-015: Database query optimization (Quick)
-- ISS-021: Image lazy loading (Medium)
-
-**Excludes ISS-003 (refactoring):** Saving for dedicated code health phase
+```bash
+bd update <id> --priority=1
 ```
 
-This creates traceability: enhancement discovered → logged → planned → addressed → documented.
+This creates traceability: enhancement discovered → beads issue created → planned → addressed → closed.

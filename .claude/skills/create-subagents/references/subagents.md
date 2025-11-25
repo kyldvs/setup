@@ -122,11 +122,16 @@ Use `/agents` command to see full list of available tools.
 
 <model_selection>
 <model_capabilities>
+**Opus 4.5** (`opus`):
+- Highest reasoning capability for complex tasks
+- Now reasonably priced - primary recommendation for complex analysis, multi-step planning, and critical decisions
+- **Use for**: Complex reasoning, strategic planning, critical security decisions, highest-stakes work
+
 **Sonnet 4.5** (`sonnet`):
 - "Best model in the world for agents" (Anthropic)
 - Exceptional at agentic tasks: 64% problem-solving on coding benchmarks
 - SWE-bench Verified: 49.0%
-- **Use for**: Planning, complex reasoning, validation, critical decisions
+- **Use for**: Standard tasks, balanced performance/cost, validation, general planning
 
 **Haiku 4.5** (`haiku`):
 - "Near-frontier performance" - 90% of Sonnet 4.5's capabilities
@@ -134,19 +139,26 @@ Use `/agents` command to see full list of available tools.
 - Fastest and most cost-efficient
 - **Use for**: Task execution, simple transformations, high-volume processing
 
-**Opus** (`opus`):
-- Highest performance on evaluation benchmarks
-- Most capable but slowest and most expensive
-- **Use for**: Highest-stakes decisions, most complex reasoning
-
 **Inherit** (`inherit`):
 - Uses same model as main conversation
 - **Use for**: Ensuring consistent capabilities throughout session
 </model_capabilities>
 
 <orchestration_strategy>
-**Sonnet + Haiku orchestration pattern** (optimal cost/performance):
+**Common orchestration patterns**:
 
+**Opus 4.5 for complex planning/validation** (highest-stakes workflows):
+```markdown
+1. Opus 4.5 (Strategic Coordinator):
+   - Complex analysis and planning
+   - Critical decision points
+   - Highest-stakes validation
+
+2. Sonnet/Haiku workers: Execute tasks based on complexity
+3. Opus 4.5 (Final Validator): Ensures strategic coherence
+```
+
+**Sonnet + Haiku orchestration** (optimal cost/performance for standard workflows):
 ```markdown
 1. Sonnet 4.5 (Coordinator):
    - Creates plan
@@ -164,7 +176,7 @@ Use `/agents` command to see full list of available tools.
    - Ensures coherence
 ```
 
-**Benefit**: Use expensive Sonnet only for planning and validation, cheap Haiku for execution.
+**Benefit**: Match model capability to task complexity. Use Opus for complex reasoning, Sonnet for standard coordination, Haiku for execution.
 </orchestration_strategy>
 
 <decision_framework>
@@ -174,12 +186,14 @@ Use `/agents` command to see full list of available tools.
 |-----------|------------------|-----------|
 | Simple validation | Haiku | Fast, cheap, sufficient capability |
 | Code execution | Haiku | 73.3% SWE-bench, very fast |
-| Complex analysis | Sonnet | Superior reasoning, worth the cost |
-| Multi-step planning | Sonnet | Best for breaking down complexity |
-| Quality validation | Sonnet | Critical checkpoint, needs intelligence |
+| Complex analysis | Opus | Highest reasoning capability for intricate problems |
+| Multi-step planning | Opus | Superior at breaking down complex workflows |
+| Quality validation | Sonnet | Strong checkpoint capability, balanced cost |
 | Batch processing | Haiku | Cost efficiency for high volume |
-| Critical security | Sonnet | High stakes require best model |
+| Critical security | Opus | Highest stakes require strongest reasoning |
 | Output synthesis | Sonnet | Ensuring coherence across inputs |
+| Strategic decisions | Opus | Complex trade-offs, long-term implications |
+| Standard coordination | Sonnet | Agentic excellence, balanced performance |
 </decision_framework>
 </model_selection>
 

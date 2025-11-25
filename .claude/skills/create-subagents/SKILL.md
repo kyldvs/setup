@@ -249,7 +249,7 @@ You can also edit subagent files directly:
 
 **Subagent usage and configuration**: [references/subagents.md](references/subagents.md)
 - File format and configuration
-- Model selection (Sonnet 4.5 + Haiku 4.5 orchestration)
+- Model selection (Opus 4.5 for complex tasks, Sonnet 4.5 + Haiku 4.5 orchestration)
 - Tool security and least privilege
 - Prompt caching optimization
 - Complete examples
@@ -283,7 +283,7 @@ You can also edit subagent files directly:
 
 **Orchestration patterns**: [references/orchestration-patterns.md](references/orchestration-patterns.md)
 - Sequential, parallel, hierarchical, coordinator patterns
-- Sonnet + Haiku orchestration for cost/performance
+- Multi-tier orchestration (Opus for complex reasoning, Sonnet + Haiku for standard workflows)
 - Multi-agent coordination
 - Pattern selection guidance
 
@@ -303,5 +303,5 @@ A well-configured subagent has:
 - XML-structured system prompt with role, approach, and constraints
 - Description field optimized for automatic routing
 - Successfully tested on representative tasks
-- Model selection appropriate for task complexity (Sonnet for reasoning, Haiku for simple tasks)
+- Model selection appropriate for task complexity (Opus for complex reasoning, Sonnet for standard tasks, Haiku for simple/fast tasks)
 </success_criteria>
