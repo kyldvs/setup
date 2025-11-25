@@ -43,3 +43,6 @@ pnpm-lock.yaml
 
 # OS
 Thumbs.db
+
+# Rust
+target/

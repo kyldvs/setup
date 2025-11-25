@@ -531,6 +531,8 @@ arc:
     "1. On Each Profile -> Passwords -> Settings" \
     "2. Disable 'Offer to Save Passwords'"
 
+  # TODO: Settings -> Links -> Disable Links from other apps open in Little Arc.
+
 # Configures the mac dock.
 mac-dock:
   #!/usr/bin/env bash
