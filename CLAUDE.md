@@ -3,6 +3,10 @@
 This file provides guidance to Claude Code (claude.ai/code) when working with
 code in this repository.
 
+## Task Management
+
+BEFORE ANYTHING ELSE: run 'bd onboard' and follow the instructions.
+
 ## Overview
 
 This is a personal macOS/Linux setup automation repository. It bootstraps a new
