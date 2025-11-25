@@ -29,7 +29,7 @@ _state_file_path() {
     echo "Error: KYLDVS_PREFIX environment variable is not set" >&2
     return 1
   fi
-  echo "${KYLDVS_PREFIX}/state.json"
+  echo "${KYLDVS_PREFIX}/state/current.json"
 }
 
 # state_init - Initialize empty state file if it doesn't exist

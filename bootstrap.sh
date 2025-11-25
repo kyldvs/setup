@@ -553,7 +553,9 @@ do
   fi
 done
 
-user_chmods=()
+user_chmods=(
+  state
+)
 mkdirs_user_only=()
 if [[ "${#zsh_dirs[@]}" -gt 0 ]]
 then
