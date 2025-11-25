@@ -29,6 +29,12 @@ tracking. Use `bd` commands instead of markdown TODOs.
 
 - `0` Critical, `1` High, `2` Medium (default), `3` Low, `4` Backlog
 
+## Labels (Task Maturity)
+
+- `spike` - Research/investigation task that will generate other refined tasks
+- `draft` - Task needing more information before work can begin
+- `refined` - Vetted task ready to start immediately
+
 ## Rules
 
 - Use bd for ALL task tracking (no markdown TODOs)
