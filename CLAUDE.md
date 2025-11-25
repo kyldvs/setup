@@ -43,6 +43,42 @@ tracking. Use `bd` commands instead of markdown TODOs.
 
 <!-- </beads-rules> -->
 
+<!-- <sdd-rules> -->
+
+# Spec-Driven Development
+
+This project uses spec-driven development (SDD) for feature work.
+
+## Quick Start
+
+- Use the **pm** subagent to create a new spec with beads issue
+- Use the **researcher** subagent to research codebase and external sources
+- Use the **historian** subagent to record changes to history
+
+## Workflow
+
+1. **Create spec**: Ask pm subagent to create spec for feature
+2. **Refine**: Add scenarios, requirements, success criteria
+3. **Plan**: Break into tasks with `bd create`
+4. **Implement**: Work through tasks
+5. **Record**: historian subagent logs significant changes
+6. **Close**: `bd close <id>`
+
+## File Locations
+
+- Specs: `docs/specs/<name>/spec.md`
+- Spec index: `docs/specs/index.md`
+- History: `docs/history/current.md`
+
+## Rules
+
+- Every feature MUST have a spec before implementation
+- Every spec MUST link to a beads issue (via `beads-id` frontmatter)
+- Record significant changes with historian subagent
+- Use researcher subagent before making architectural decisions
+
+<!-- </sdd-rules> -->
+
 ## Overview
 
 This is a personal macOS/Linux setup automation repository. It bootstraps a new
