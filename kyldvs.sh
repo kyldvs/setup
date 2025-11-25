@@ -7,6 +7,7 @@ set -euo pipefail
 export KYLDVS_PREFIX="/usr/local/kyldvs"
 export KYLDVS_REPOSITORY="${KYLDVS_PREFIX}/setup"
 export KYLDVS_BIN="${KYLDVS_PREFIX}/bin"
+export KYLDVS_STATE="${HOME}/.config/kyldvs/state.json"
 
 # Defer to Just for all commands.
 just -d "$KYLDVS_REPOSITORY" -f "$KYLDVS_REPOSITORY/justfile" -- "$@"

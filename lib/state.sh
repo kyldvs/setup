@@ -25,11 +25,11 @@ set -euo pipefail
 
 # Get the path to the state file
 _state_file_path() {
-  if [[ -z "${KYLDVS_PREFIX:-}" ]]; then
-    echo "Error: KYLDVS_PREFIX environment variable is not set" >&2
+  if [[ -z "${KYLDVS_STATE:-}" ]]; then
+    echo "Error: KYLDVS_STATE environment variable is not set" >&2
     return 1
   fi
-  echo "${KYLDVS_PREFIX}/state/current.json"
+  echo "${KYLDVS_STATE}"
 }
 
 # state_init - Initialize empty state file if it doesn't exist
