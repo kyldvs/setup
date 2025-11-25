@@ -6,7 +6,164 @@ _default: help
 
 # --- Tasks ---
 
+# Undo a completed setup step by ID
+undo STEP_ID:
+  #!/usr/bin/env bash
+  set -euo pipefail
+
+  # Set KYLDVS_PREFIX based on OS (matches bootstrap.sh logic)
+  if [[ "$(uname)" == "Darwin" ]]; then
+    export KYLDVS_PREFIX="/usr/local/kyldvs"
+  else
+    export KYLDVS_PREFIX="/home/kyldvs"
+  fi
+
+  # Find the repository root by looking for the lib directory
+  REPO_ROOT="$(pwd)"
+  while [[ "$REPO_ROOT" != "/" ]]; do
+    if [[ -f "$REPO_ROOT/lib/state.sh" ]]; then
+      break
+    fi
+    REPO_ROOT="$(dirname "$REPO_ROOT")"
+  done
+
+  if [[ ! -f "$REPO_ROOT/lib/state.sh" ]]; then
+    echo "Error: Could not find lib/state.sh" >&2
+    exit 1
+  fi
+
+  # Source state library
+  source "$REPO_ROOT/lib/state.sh"
+
+  step_id="{{ STEP_ID }}"
+
+  # Check if step exists and is undoable
+  if ! state_is_undoable "$step_id"; then
+    echo "Error: Step '$step_id' cannot be undone"
+    echo "Reasons:"
+    echo "  - Step may not be completed yet"
+    echo "  - Step may not be reversible (only brew, brew-cask, mac-defaults can be undone)"
+    echo "  - Step may already be undone"
+    echo ""
+    echo "Run 'just setup undo-list' to see available steps"
+    exit 1
+  fi
+
+  # Get step info
+  subtype=$(state_get_subtype "$step_id")
+  desc=$(state_get_description "$step_id")
+
+  echo "Undoing: $desc"
+  echo "Type: $subtype"
+  echo ""
+
+  # Call appropriate undo function
+  case "$subtype" in
+    brew)
+      undo_brew "$step_id"
+      ;;
+    brew-cask)
+      undo_brew_cask "$step_id"
+      ;;
+    mac-defaults)
+      undo_mac_defaults "$step_id"
+      ;;
+    *)
+      echo "Error: Unknown subtype '$subtype'"
+      exit 1
+      ;;
+  esac
+
+  # Mark as undone
+  state_mark_undone "$step_id"
+
+  echo ""
+  echo "Step undone successfully"
+  echo "Run 'just setup <step>' to re-apply"
+
+# List steps that can be undone
+undo-list:
+  #!/usr/bin/env bash
+  set -euo pipefail
+
+  # Set KYLDVS_PREFIX based on OS (matches bootstrap.sh logic)
+  if [[ "$(uname)" == "Darwin" ]]; then
+    export KYLDVS_PREFIX="/usr/local/kyldvs"
+  else
+    export KYLDVS_PREFIX="/home/kyldvs"
+  fi
+
+  # Find the repository root by looking for the lib directory
+  REPO_ROOT="$(pwd)"
+  while [[ "$REPO_ROOT" != "/" ]]; do
+    if [[ -f "$REPO_ROOT/lib/state.sh" ]]; then
+      break
+    fi
+    REPO_ROOT="$(dirname "$REPO_ROOT")"
+  done
+
+  if [[ ! -f "$REPO_ROOT/lib/state.sh" ]]; then
+    echo "Error: Could not find lib/state.sh" >&2
+    exit 1
+  fi
+
+  # Source state library
+  source "$REPO_ROOT/lib/state.sh"
+
+  # Get undoable steps
+  undoable=$(state_list_undoable)
+
+  if [ -z "$undoable" ]; then
+    echo "No steps available to undo"
+    exit 0
+  fi
+
+  # Display header
+  printf "%-20s %-35s %s\n" "Step ID" "Description" "Type"
+  printf "%.0s-" {1..70}
+  echo
+
+  # Display steps
+  echo "$undoable" | while IFS=$'\t' read -r id desc subtype; do
+    printf "%-20s %-35s %s\n" "$id" "$desc" "$subtype"
+  done
+
+# Initialize state file for tracking setup progress
+init-state:
+  #!/usr/bin/env bash
+  set -euo pipefail
+
+  # Set KYLDVS_PREFIX based on OS (matches bootstrap.sh logic)
+  if [[ "$(uname)" == "Darwin" ]]; then
+    export KYLDVS_PREFIX="/usr/local/kyldvs"
+  else
+    export KYLDVS_PREFIX="/home/kyldvs"
+  fi
+
+  # Find the repository root by looking for the lib directory
+  # Start from current directory and walk up to find lib/state.sh
+  REPO_ROOT="$(pwd)"
+  while [[ "$REPO_ROOT" != "/" ]]; do
+    if [[ -f "$REPO_ROOT/lib/state.sh" ]]; then
+      break
+    fi
+    REPO_ROOT="$(dirname "$REPO_ROOT")"
+  done
+
+  if [[ ! -f "$REPO_ROOT/lib/state.sh" ]]; then
+    echo "Error: Could not find lib/state.sh" >&2
+    exit 1
+  fi
+
+  # Source state library
+  source "$REPO_ROOT/lib/state.sh"
+
+  # Initialize state file
+  state_init
+  echo "State file initialized at $KYLDVS_PREFIX/state.json"
+
 all:
+  just setup init-state
   just setup brew
   just setup home
   just setup brew-services
@@ -22,290 +179,525 @@ home:
   #!/usr/bin/env bash
   set -euo pipefail
 
-  # Stow dotfiles.
-  ls -A links | grep -v "^\.\+$" | xargs stow -d ./links -t "$HOME"
+  # Set KYLDVS_PREFIX based on OS (matches bootstrap.sh logic)
+  if [[ "$(uname)" == "Darwin" ]]; then
+    export KYLDVS_PREFIX="/usr/local/kyldvs"
+  else
+    export KYLDVS_PREFIX="/home/kyldvs"
+  fi
+
+  # Find the repository root by looking for the lib directory
+  REPO_ROOT="$(pwd)"
+  while [[ "$REPO_ROOT" != "/" ]]; do
+    if [[ -f "$REPO_ROOT/lib/state.sh" ]]; then
+      break
+    fi
+    REPO_ROOT="$(dirname "$REPO_ROOT")"
+  done
+
+  if [[ ! -f "$REPO_ROOT/lib/state.sh" ]]; then
+    echo "Error: Could not find lib/state.sh" >&2
+    exit 1
+  fi
+
+  # Source state library
+  source "$REPO_ROOT/lib/state.sh"
+
+  # Use run_step wrapper for idempotent execution
+  run_step "home-dotfiles" "Link dotfiles using stow" "automated" "other" "ls -A links | grep -v '^\.\+$' | xargs stow -d ./links -t \"\$HOME\""
 
 # Install desired brew packages.
 brew:
   #!/usr/bin/env bash
   set -euo pipefail
 
-  # Bitwarden password manager.
-  brew install --cask bitwarden
+  # Set KYLDVS_PREFIX based on OS (matches bootstrap.sh logic)
+  if [[ "$(uname)" == "Darwin" ]]; then
+    export KYLDVS_PREFIX="/usr/local/kyldvs"
+  else
+    export KYLDVS_PREFIX="/home/kyldvs"
+  fi
 
-  # Arc browser.
-  brew install --cask arc
+  # Find the repository root by looking for the lib directory
+  REPO_ROOT="$(pwd)"
+  while [[ "$REPO_ROOT" != "/" ]]; do
+    if [[ -f "$REPO_ROOT/lib/state.sh" ]]; then
+      break
+    fi
+    REPO_ROOT="$(dirname "$REPO_ROOT")"
+  done
 
-  # WezTerm terminal.
-  brew install --cask wezterm
+  if [[ ! -f "$REPO_ROOT/lib/state.sh" ]]; then
+    echo "Error: Could not find lib/state.sh" >&2
+    exit 1
+  fi
 
-  # Warp terminal.
-  brew install --cask warp
+  # Source state library
+  source "$REPO_ROOT/lib/state.sh"
 
-  # JetBrains Mono Nerd Font.
-  brew install --cask font-jetbrains-mono-nerd-font
+  # Use run_step wrapper for idempotent execution
+  run_step "brew-install" "Install brew packages and casks" "automated" "brew-cask" '
+    # Bitwarden password manager.
+    brew install --cask bitwarden
 
-  # Warp terminal.
-  brew install --cask visual-studio-code
+    # Arc browser.
+    brew install --cask arc
 
-  # Tiling window manager.
-  # - https://github.com/nikitabobko/AeroSpace
-  brew install --cask nikitabobko/tap/aerospace
+    # WezTerm terminal.
+    brew install --cask wezterm
 
-  # Alfred productivity app.
-  # - https://www.alfredapp.com/
-  brew install --cask alfred
+    # Warp terminal.
+    brew install --cask warp
 
-  # Top bar.
-  brew install --cask jordanbaird-ice
+    # JetBrains Mono Nerd Font.
+    brew install --cask font-jetbrains-mono-nerd-font
 
-  # Slack communication app.
-  brew install --cask slack
+    # Warp terminal.
+    brew install --cask visual-studio-code
 
-  # Figma design app.
-  brew install --cask figma
+    # Tiling window manager.
+    # - https://github.com/nikitabobko/AeroSpace
+    brew install --cask nikitabobko/tap/aerospace
 
-  # Linear App
-  brew install --cask linear-linear
+    # Alfred productivity app.
+    # - https://www.alfredapp.com/
+    brew install --cask alfred
 
-  # Linear mouse app
-  # - https://github.com/linearmouse/linearmouse
-  brew install --cask linearmouse
+    # Top bar.
+    brew install --cask jordanbaird-ice
 
-  # dockutil: Dock utility to manage macOS dock items.
-  # - https://formulae.brew.sh/formula/dockutil
-  # - https://github.com/kcrawford/dockutil
+    # Slack communication app.
+    brew install --cask slack
 
-  # Entire list of normal brew packages.
-  brew install \
-    bat \
-    bufbuild/buf/buf \
-    cmake \
-    coreutils \
-    cowsay \
-    dockutil \
-    eza \
-    fd \
-    felixkratz/formulae/borders \
-    ffmpeg \
-    fzf \
-    gh \
-    glow \
-    go \
-    goose \
-    hashicorp/tap/terraform \
-    helm \
-    htop \
-    imagemagick \
-    jq \
-    kind \
-    livekit-cli \
-    md5sha1sum \
-    mosh \
-    neofetch \
-    neovim \
-    opentofu \
-    postgresql@17 \
-    pulumi/tap/pulumi \
-    python@3.13 \
-    redis \
-    ripgrep \
-    ruff \
-    shellcheck \
-    steveyegge/beads/bd \
-    stow \
-    the_silver_searcher \
-    tilt-dev/tap/ctlptl \
-    tilt-dev/tap/tilt \
-    tmux \
-    tree \
-    uv \
-    wget \
-    withgraphite/tap/graphite \
-    yq \
-    zoxide \
-    zsh-autosuggestions \
-    zsh-syntax-highlighting
+    # Figma design app.
+    brew install --cask figma
+
+    # Linear App
+    brew install --cask linear-linear
+
+    # Linear mouse app
+    # - https://github.com/linearmouse/linearmouse
+    brew install --cask linearmouse
+
+    # dockutil: Dock utility to manage macOS dock items.
+    # - https://formulae.brew.sh/formula/dockutil
+    # - https://github.com/kcrawford/dockutil
+
+    # Entire list of normal brew packages.
+    brew install \
+      bat \
+      bufbuild/buf/buf \
+      cmake \
+      coreutils \
+      cowsay \
+      dockutil \
+      eza \
+      fd \
+      felixkratz/formulae/borders \
+      ffmpeg \
+      fzf \
+      gh \
+      glow \
+      go \
+      goose \
+      hashicorp/tap/terraform \
+      helm \
+      htop \
+      imagemagick \
+      jq \
+      kind \
+      livekit-cli \
+      md5sha1sum \
+      mosh \
+      neofetch \
+      neovim \
+      opentofu \
+      postgresql@17 \
+      pulumi/tap/pulumi \
+      python@3.13 \
+      redis \
+      ripgrep \
+      ruff \
+      shellcheck \
+      steveyegge/beads/bd \
+      stow \
+      the_silver_searcher \
+      tilt-dev/tap/ctlptl \
+      tilt-dev/tap/tilt \
+      tmux \
+      tree \
+      uv \
+      wget \
+      withgraphite/tap/graphite \
+      yq \
+      zoxide \
+      zsh-autosuggestions \
+      zsh-syntax-highlighting
+  '
 
 # Start desired brew services.
 brew-services:
   #!/usr/bin/env bash
   set -euo pipefail
 
-  # Start services.
-  brew services start postgresql@17
-  brew services start felixkratz/formulae/borders
+  # Set KYLDVS_PREFIX based on OS (matches bootstrap.sh logic)
+  if [[ "$(uname)" == "Darwin" ]]; then
+    export KYLDVS_PREFIX="/usr/local/kyldvs"
+  else
+    export KYLDVS_PREFIX="/home/kyldvs"
+  fi
+
+  # Find the repository root by looking for the lib directory
+  REPO_ROOT="$(pwd)"
+  while [[ "$REPO_ROOT" != "/" ]]; do
+    if [[ -f "$REPO_ROOT/lib/state.sh" ]]; then
+      break
+    fi
+    REPO_ROOT="$(dirname "$REPO_ROOT")"
+  done
+
+  if [[ ! -f "$REPO_ROOT/lib/state.sh" ]]; then
+    echo "Error: Could not find lib/state.sh" >&2
+    exit 1
+  fi
+
+  # Source state library
+  source "$REPO_ROOT/lib/state.sh"
+
+  # Use run_step wrapper for idempotent execution
+  run_step "brew-services" "Start brew services" "automated" "brew" '
+    # Start services.
+    brew services start postgresql@17
+    brew services start felixkratz/formulae/borders
+  '
 
 docker:
   #!/usr/bin/env bash
   set -euo pipefail
 
-  # Install Docker Desktop if not installed.
-  if [ ! -d "/Applications/Docker.app" ]; then
-    # Download to ./cache/downloads/Docker.dmg
-    mkdir -p ./cache/downloads
-    curl -L -o ./cache/downloads/Docker.dmg https://desktop.docker.com/mac/main/arm64/Docker.dmg
-    sudo hdiutil attach ./cache/downloads/Docker.dmg
-    sudo /Volumes/Docker/Docker.app/Contents/MacOS/install --accept-license
-    sudo hdiutil detach /Volumes/Docker
+  # Set KYLDVS_PREFIX based on OS (matches bootstrap.sh logic)
+  if [[ "$(uname)" == "Darwin" ]]; then
+    export KYLDVS_PREFIX="/usr/local/kyldvs"
   else
-    echo "Docker Desktop is already installed, skipping."
+    export KYLDVS_PREFIX="/home/kyldvs"
   fi
+
+  # Find the repository root by looking for the lib directory
+  REPO_ROOT="$(pwd)"
+  while [[ "$REPO_ROOT" != "/" ]]; do
+    if [[ -f "$REPO_ROOT/lib/state.sh" ]]; then
+      break
+    fi
+    REPO_ROOT="$(dirname "$REPO_ROOT")"
+  done
+
+  if [[ ! -f "$REPO_ROOT/lib/state.sh" ]]; then
+    echo "Error: Could not find lib/state.sh" >&2
+    exit 1
+  fi
+
+  # Source state library
+  source "$REPO_ROOT/lib/state.sh"
+
+  # Use run_step wrapper for idempotent execution
+  run_step "docker-desktop" "Install Docker Desktop" "automated" "brew-cask" '
+    # Install Docker Desktop if not installed.
+    if [ ! -d "/Applications/Docker.app" ]; then
+      # Download to ./cache/downloads/Docker.dmg
+      mkdir -p ./cache/downloads
+      curl -L -o ./cache/downloads/Docker.dmg https://desktop.docker.com/mac/main/arm64/Docker.dmg
+      sudo hdiutil attach ./cache/downloads/Docker.dmg
+      sudo /Volumes/Docker/Docker.app/Contents/MacOS/install --accept-license
+      sudo hdiutil detach /Volumes/Docker
+    else
+      echo "Docker Desktop is already installed, skipping."
+    fi
+  '
 
 # Install Rust programming language.
 rust:
   #!/usr/bin/env bash
   set -euo pipefail
 
-  # Install rust via rustup.
-  # Check if rustup is already installed.
-  if command -v rustup &> /dev/null; then
-    echo "> rustup is already installed, skipping."
+  # Set KYLDVS_PREFIX based on OS (matches bootstrap.sh logic)
+  if [[ "$(uname)" == "Darwin" ]]; then
+    export KYLDVS_PREFIX="/usr/local/kyldvs"
   else
-    curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+    export KYLDVS_PREFIX="/home/kyldvs"
   fi
+
+  # Find the repository root by looking for the lib directory
+  REPO_ROOT="$(pwd)"
+  while [[ "$REPO_ROOT" != "/" ]]; do
+    if [[ -f "$REPO_ROOT/lib/state.sh" ]]; then
+      break
+    fi
+    REPO_ROOT="$(dirname "$REPO_ROOT")"
+  done
+
+  if [[ ! -f "$REPO_ROOT/lib/state.sh" ]]; then
+    echo "Error: Could not find lib/state.sh" >&2
+    exit 1
+  fi
+
+  # Source state library
+  source "$REPO_ROOT/lib/state.sh"
+
+  # Use run_step wrapper for idempotent execution
+  run_step "rust" "Install Rust via rustup" "automated" "other" "curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh"
 
 # Install nvm (Node Version Manager).
 nvm:
   #!/usr/bin/env bash
   set -euo pipefail
 
-  # Check if nvm is installed
-  if [ -f "$HOME/.nvm/nvm.sh" ]; then
-    echo "> nvm is already installed, skipping."
+  # Set KYLDVS_PREFIX based on OS (matches bootstrap.sh logic)
+  if [[ "$(uname)" == "Darwin" ]]; then
+    export KYLDVS_PREFIX="/usr/local/kyldvs"
   else
-    # Set profile to null to prevent nvm from trying to modify shell profile.
-    PROFILE=/dev/null bash -c 'curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.3/install.sh | bash'
+    export KYLDVS_PREFIX="/home/kyldvs"
   fi
+
+  # Find the repository root by looking for the lib directory
+  REPO_ROOT="$(pwd)"
+  while [[ "$REPO_ROOT" != "/" ]]; do
+    if [[ -f "$REPO_ROOT/lib/state.sh" ]]; then
+      break
+    fi
+    REPO_ROOT="$(dirname "$REPO_ROOT")"
+  done
+
+  if [[ ! -f "$REPO_ROOT/lib/state.sh" ]]; then
+    echo "Error: Could not find lib/state.sh" >&2
+    exit 1
+  fi
+
+  # Source state library
+  source "$REPO_ROOT/lib/state.sh"
+
+  # Use run_step wrapper for idempotent execution
+  run_step "nvm" "Install Node Version Manager" "automated" "other" '
+    # Check if nvm is installed
+    if [ -f "$HOME/.nvm/nvm.sh" ]; then
+      echo "> nvm is already installed, skipping."
+    else
+      # Set profile to null to prevent nvm from trying to modify shell profile.
+      PROFILE=/dev/null bash -c "curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.3/install.sh | bash"
+    fi
+  '
 
 # Manual steps needed for arc.
 arc:
   #!/usr/bin/env bash
   set -euo pipefail
 
-  # Action items.
-  # - [ ] Login.
-  # - [ ] Settings -> Kyle -> Sync sidebar.
-  # - [ ] Settings -> Profiles -> Make: Personal, Stoke, Ragkit.
-  # - [ ] Settings -> Profiles -> Set as Default
-  # - [ ] Settings -> Profiles -> Archive Tabs after 30 days
-  # - [ ] Settings -> Profiles -> Downloads -> Ask Every Time
-  # - [ ] Settings -> Arc -> Set as Default Browser
-  # - [ ] On Each Profile -> Passwords -> Settings -> Disable Offer to Save Passwords
+  # Find the repository root by looking for the lib directory
+  REPO_ROOT="$(pwd)"
+  while [[ "$REPO_ROOT" != "/" ]]; do
+    if [[ -f "$REPO_ROOT/lib/manual.sh" ]]; then
+      break
+    fi
+    REPO_ROOT="$(dirname "$REPO_ROOT")"
+  done
+
+  if [[ ! -f "$REPO_ROOT/lib/manual.sh" ]]; then
+    echo "Error: Could not find lib/manual.sh" >&2
+    exit 1
+  fi
+
+  # Source manual step function
+  source "$REPO_ROOT/lib/manual.sh"
+
+  run_manual_step "arc-login" "Arc browser login" \
+    "1. Open Arc browser" \
+    "2. Click on profile icon" \
+    "3. Select 'Login' and complete authentication"
+
+  run_manual_step "arc-sync-sidebar" "Sync Arc sidebar" \
+    "1. Open Arc Settings" \
+    "2. Navigate to: Kyle -> Sync sidebar" \
+    "3. Enable sidebar sync"
+
+  run_manual_step "arc-profiles" "Configure Arc profiles" \
+    "1. Settings -> Profiles -> Make: Personal, Stoke, Ragkit" \
+    "2. Settings -> Profiles -> Set as Default" \
+    "3. Settings -> Profiles -> Archive Tabs after 30 days" \
+    "4. Settings -> Profiles -> Downloads -> Ask Every Time"
+
+  run_manual_step "arc-defaults" "Set Arc as default browser" \
+    "1. Settings -> Arc -> Set as Default Browser"
+
+  run_manual_step "arc-passwords" "Disable password saving" \
+    "1. On Each Profile -> Passwords -> Settings" \
+    "2. Disable 'Offer to Save Passwords'"
 
 # Configures the mac dock.
 mac-dock:
   #!/usr/bin/env bash
   set -euo pipefail
 
-  # TODO: Check that dockutil is installed. Say to use brew install if not.
-  DOCK_ITEMS=$(dockutil --list | awk -F'file:///' '{gsub(/[[:space:]]+$/, "", $1); print $1}')
+  # Set KYLDVS_PREFIX based on OS (matches bootstrap.sh logic)
+  if [[ "$(uname)" == "Darwin" ]]; then
+    export KYLDVS_PREFIX="/usr/local/kyldvs"
+  else
+    export KYLDVS_PREFIX="/home/kyldvs"
+  fi
 
-  try_remove_dock_item() {
-    if echo "$DOCK_ITEMS" | grep -Fxq "$1"; then
-      dockutil --remove "$1" --no-restart
+  # Find the repository root by looking for the lib directory
+  REPO_ROOT="$(pwd)"
+  while [[ "$REPO_ROOT" != "/" ]]; do
+    if [[ -f "$REPO_ROOT/lib/state.sh" ]]; then
+      break
     fi
-  }
+    REPO_ROOT="$(dirname "$REPO_ROOT")"
+  done
+
+  if [[ ! -f "$REPO_ROOT/lib/state.sh" ]]; then
+    echo "Error: Could not find lib/state.sh" >&2
+    exit 1
+  fi
+
+  # Source state library
+  source "$REPO_ROOT/lib/state.sh"
+
+  # Use run_step wrapper for idempotent execution
+  run_step "mac-dock" "Configure macOS dock" "automated" "mac-defaults" '
+    # TODO: Check that dockutil is installed. Say to use brew install if not.
+    DOCK_ITEMS=$(dockutil --list | awk -F"file:///" "{gsub(/[[:space:]]+$/, \"\", \$1); print \$1}")
+
+    try_remove_dock_item() {
+      if echo "$DOCK_ITEMS" | grep -Fxq "$1"; then
+        dockutil --remove "$1" --no-restart
+      fi
+    }
 
 
-  # Keep: Finder, System Settings, Downloads, Trash.
-  try_remove_dock_item "Launchpad"
-  try_remove_dock_item "Messages"
-  try_remove_dock_item "Safari"
-  try_remove_dock_item "Mail"
-  try_remove_dock_item "Maps"
-  try_remove_dock_item "Photos"
-  try_remove_dock_item "FaceTime"
-  try_remove_dock_item "Calendar"
-  try_remove_dock_item "Contacts"
-  try_remove_dock_item "Reminders"
-  try_remove_dock_item "Notes"
-  try_remove_dock_item "Freeform"
-  try_remove_dock_item "TV"
-  try_remove_dock_item "Music"
-  try_remove_dock_item "News"
-  try_remove_dock_item "Keynote"
-  try_remove_dock_item "Numbers"
-  try_remove_dock_item "Pages"
-  try_remove_dock_item "App Store"
+    # Keep: Finder, System Settings, Downloads, Trash.
+    try_remove_dock_item "Launchpad"
+    try_remove_dock_item "Messages"
+    try_remove_dock_item "Safari"
+    try_remove_dock_item "Mail"
+    try_remove_dock_item "Maps"
+    try_remove_dock_item "Photos"
+    try_remove_dock_item "FaceTime"
+    try_remove_dock_item "Calendar"
+    try_remove_dock_item "Contacts"
+    try_remove_dock_item "Reminders"
+    try_remove_dock_item "Notes"
+    try_remove_dock_item "Freeform"
+    try_remove_dock_item "TV"
+    try_remove_dock_item "Music"
+    try_remove_dock_item "News"
+    try_remove_dock_item "Keynote"
+    try_remove_dock_item "Numbers"
+    try_remove_dock_item "Pages"
+    try_remove_dock_item "App Store"
 
-  # Finally, remove spacer tiles and do a restart.
-  dockutil --remove spacer-tiles --restart
+    # Finally, remove spacer tiles and do a restart.
+    dockutil --remove spacer-tiles --restart
+  '
 
 # Sets macOS defaults to desired values.
 mac-defaults:
   #!/usr/bin/env bash
   set -euo pipefail
 
-  # See: https://macos-defaults.com/
+  # Set KYLDVS_PREFIX based on OS (matches bootstrap.sh logic)
+  if [[ "$(uname)" == "Darwin" ]]; then
+    export KYLDVS_PREFIX="/usr/local/kyldvs"
+  else
+    export KYLDVS_PREFIX="/home/kyldvs"
+  fi
 
-  echo "Setting macOS defaults..."
-
-  # Usage: ensure_defaults "com.apple.dock" "orientation" "-string" "left"
-  ensure_defaults() {
-    local domain="$1"
-    local key="$2"
-    local type="$3"
-    local value="$4"
-
-    # Get current value (redirect stderr to avoid error if key does not exist)
-    local current_value
-    current_value=$(defaults read "$domain" "$key" 2>/dev/null || echo "null")
-
-    # Check if the current value matches the desired value
-    if [[ "$current_value" != "$value" ]]; then
-      # Set the value and echo message
-      echo "--> Setting $domain $key to '$value'"
-      defaults write "$domain" "$key" "$type" "$value"
+  # Find the repository root by looking for the lib directory
+  REPO_ROOT="$(pwd)"
+  while [[ "$REPO_ROOT" != "/" ]]; do
+    if [[ -f "$REPO_ROOT/lib/state.sh" ]]; then
+      break
     fi
-  }
+    REPO_ROOT="$(dirname "$REPO_ROOT")"
+  done
 
-  # Dock on left.
-  ensure_defaults "com.apple.dock" "orientation" "-string" "left"
-  # Make icons smaller.
-  ensure_defaults "com.apple.dock" "tilesize" "-int" "42"
-  # Auto-hide the Dock.
-  ensure_defaults "com.apple.dock" "autohide" "-bool" "true"
-  # Make the hide animation instant.
-  ensure_defaults "com.apple.dock" "autohide-time-modifier" "-float" "0"
-  # Do not show recent applications.
-  ensure_defaults "com.apple.dock" "show-recents" "-bool" "false"
-  # Reduce the minimize animation.
-  ensure_defaults "com.apple.dock" "mineffect" "-string" "scale"
-  # Do not rearrange spaces automatically.
-  ensure_defaults "com.apple.dock" "mru-spaces" "-bool" "false"
+  if [[ ! -f "$REPO_ROOT/lib/state.sh" ]]; then
+    echo "Error: Could not find lib/state.sh" >&2
+    exit 1
+  fi
 
-  # Update screenshots save location.
-  mkdir -p "$HOME/Screenshots"
-  ensure_defaults "com.apple.screencapture" "location" "-string" "$HOME/Screenshots"
-  # Do not show thumbnail after taking screenshot.
-  ensure_defaults "com.apple.screencapture" "show-thumbnail" "-bool" "false"
+  # Source state library
+  source "$REPO_ROOT/lib/state.sh"
 
-  # Show extensions in finder.
-  ensure_defaults "NSGlobalDomain" "AppleShowAllExtensions" "-bool" "true"
-  # Show hidden files in finder.
-  ensure_defaults "com.apple.finder" "AppleShowAllFiles" "-bool" "false"
-  # Show path bar.
-  ensure_defaults "com.apple.finder" "ShowPathbar" "-bool" "true"
-  # Set columns as the default view.
-  ensure_defaults "com.apple.finder" "FXPreferredViewStyle" "-string" "clmv"
-  # Sort folders first.
-  ensure_defaults "com.apple.finder" "_FXSortFoldersFirst" "-bool" "true"
-  # Do not show warning when changing file extension.
-  ensure_defaults "com.apple.finder" "FXEnableExtensionChangeWarning" "-bool" "false"
-  # Save locally by default, not in cloud.
-  ensure_defaults "NSGlobalDomain" "NSDocumentSaveNewDocumentsToCloud" "-bool" "false"
-  # Hide all icons on desktop.
-  ensure_defaults "com.apple.finder" "CreateDesktop" "-bool" "false"
+  # Use run_step wrapper for idempotent execution
+  run_step "mac-defaults" "Set macOS system defaults" "automated" "mac-defaults" '
+    # See: https://macos-defaults.com/
 
-  # Disable apple intelligence. Needs a restart to take effect.
-  ensure_defaults "com.apple.CloudSubscriptionFeatures.optIn" "545129924" "-bool" "false"
+    echo "Setting macOS defaults..."
 
-  echo "All defaults set, restarting affected services"
+    # Usage: ensure_defaults "com.apple.dock" "orientation" "-string" "left"
+    ensure_defaults() {
+      local domain="$1"
+      local key="$2"
+      local type="$3"
+      local value="$4"
 
-  # Restart services.
-  killall Dock
-  killall Finder
-  killall SystemUIServer
+      # Get current value (redirect stderr to avoid error if key does not exist)
+      local current_value
+      current_value=$(defaults read "$domain" "$key" 2>/dev/null || echo "null")
 
-  echo "Done. Some changes may require a logout/restart to take effect."
+      # Check if the current value matches the desired value
+      if [[ "$current_value" != "$value" ]]; then
+        # Set the value and echo message
+        echo "--> Setting $domain $key to '"'"'$value'"'"'"
+        defaults write "$domain" "$key" "$type" "$value"
+      fi
+    }
+
+    # Dock on left.
+    ensure_defaults "com.apple.dock" "orientation" "-string" "left"
+    # Make icons smaller.
+    ensure_defaults "com.apple.dock" "tilesize" "-int" "42"
+    # Auto-hide the Dock.
+    ensure_defaults "com.apple.dock" "autohide" "-bool" "true"
+    # Make the hide animation instant.
+    ensure_defaults "com.apple.dock" "autohide-time-modifier" "-float" "0"
+    # Do not show recent applications.
+    ensure_defaults "com.apple.dock" "show-recents" "-bool" "false"
+    # Reduce the minimize animation.
+    ensure_defaults "com.apple.dock" "mineffect" "-string" "scale"
+    # Do not rearrange spaces automatically.
+    ensure_defaults "com.apple.dock" "mru-spaces" "-bool" "false"
+
+    # Update screenshots save location.
+    mkdir -p "$HOME/Screenshots"
+    ensure_defaults "com.apple.screencapture" "location" "-string" "$HOME/Screenshots"
+    # Do not show thumbnail after taking screenshot.
+    ensure_defaults "com.apple.screencapture" "show-thumbnail" "-bool" "false"
+
+    # Show extensions in finder.
+    ensure_defaults "NSGlobalDomain" "AppleShowAllExtensions" "-bool" "true"
+    # Show hidden files in finder.
+    ensure_defaults "com.apple.finder" "AppleShowAllFiles" "-bool" "false"
+    # Show path bar.
+    ensure_defaults "com.apple.finder" "ShowPathbar" "-bool" "true"
+    # Set columns as the default view.
+    ensure_defaults "com.apple.finder" "FXPreferredViewStyle" "-string" "clmv"
+    # Sort folders first.
+    ensure_defaults "com.apple.finder" "_FXSortFoldersFirst" "-bool" "true"
+    # Do not show warning when changing file extension.
+    ensure_defaults "com.apple.finder" "FXEnableExtensionChangeWarning" "-bool" "false"
+    # Save locally by default, not in cloud.
+    ensure_defaults "NSGlobalDomain" "NSDocumentSaveNewDocumentsToCloud" "-bool" "false"
+    # Hide all icons on desktop.
+    ensure_defaults "com.apple.finder" "CreateDesktop" "-bool" "false"
+
+    # Disable apple intelligence. Needs a restart to take effect.
+    ensure_defaults "com.apple.CloudSubscriptionFeatures.optIn" "545129924" "-bool" "false"
+
+    echo "All defaults set, restarting affected services"
+
+    # Restart services.
+    killall Dock
+    killall Finder
+    killall SystemUIServer
+
+    echo "Done. Some changes may require a logout/restart to take effect."
+  '

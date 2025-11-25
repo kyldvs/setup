@@ -839,6 +839,12 @@ fi
     brew install just
   fi
 
+  if ! command -v jq >/dev/null
+  then
+    ohai "Installing jq..."
+    brew install jq
+  fi
+
   # TODO: Then defer to `just` as the binary to run.
 
   # TODO: Move this to the kyldvs bin.
