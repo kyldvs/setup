@@ -6,6 +6,10 @@ _default: help
 
 # --- Tasks ---
 
+# Manual things I need to add:
+# - Mac, disable double space = period.
+#   - Settings -> Keyboard -> Text Input -> Input Sources -> Edit -> Disable "Add period with double-space"
+
 # Undo a completed setup step by ID
 undo STEP_ID:
   #!/usr/bin/env bash

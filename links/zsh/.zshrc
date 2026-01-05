@@ -153,11 +153,29 @@ export PATH="/Users/kad/.local/bin:$PATH"
 export PATH="/Users/kad/go/bin:$PATH"
 
 # =============================================================================
+# Environment variables.
+# =============================================================================
+
+if [ -f ~/.config/env/.env ]; then
+    source ~/.config/env/.env
+fi
+
+# =============================================================================
 # Shell integrations.
 # =============================================================================
 
 eval "$(fzf --zsh)"
 
-# TODO: Fix zoxide- it breaks when claude code tries to use the "cd" tool.
-# Note: This will replace the "cd" command with zoxide.
-eval "$(zoxide init --cmd cd zsh)"
+# Initialize zoxide without replacing cd, then create a defensive cd wrapper.
+# Falls back to builtin cd if __zoxide_z isn't available (e.g., in subshells).
+if command -v zoxide &> /dev/null; then
+  eval "$(zoxide init zsh)"
+fi
+
+function cd() {
+  if (( $+functions[__zoxide_z] )); then
+    __zoxide_z "$@"
+  else
+    builtin cd "$@"
+  fi
+}
