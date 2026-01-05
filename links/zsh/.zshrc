@@ -152,6 +152,9 @@ esac
 export PATH="/Users/kad/.local/bin:$PATH"
 export PATH="/Users/kad/go/bin:$PATH"
 
+# Setup postgres - brew doesn't link automatically.
+export PATH="/opt/homebrew/opt/postgresql@17/bin:$PATH"
+
 # =============================================================================
 # Environment variables.
 # =============================================================================

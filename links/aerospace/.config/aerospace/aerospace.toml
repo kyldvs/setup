@@ -32,13 +32,13 @@ alt-shift-r = 'reload-config'
 # =============================================================================
 
 # Switch to apps.
-alt-enter = 'exec-and-forget open "/Applications/Warp.app"'
+alt-enter = 'exec-and-forget open "/Applications/WezTerm.app"'
 # Workaround to prevent opening zen in "troubleshoot" mode.
 # alt-a = 'exec-and-forget MOZ_DISABLE_SAFE_MODE_KEY=1 open "/Applications/Zen.app"'
 alt-a = 'exec-and-forget open "/Applications/Arc.app"'
-alt-e = 'exec-and-forget open "/Applications/Visual Studio Code.app"'
-alt-v = 'exec-and-forget open "/Applications/Visual Studio Code.app"'
-alt-w = 'exec-and-forget open "/Applications/Visual Studio Code.app"'
+alt-e = 'exec-and-forget open -a "Visual Studio Code"'
+alt-v = 'exec-and-forget open -a "Visual Studio Code"'
+alt-w = 'exec-and-forget open -a "Visual Studio Code"'
 # alt-e = 'exec-and-forget open "/Applications/Windsurf - Next.app"'
 # alt-w = 'exec-and-forget open "/Applications/Windsurf - Next.app"'
 # alt-o = 'exec-and-forget open "/Applications/Obsidian.app"'
@@ -56,7 +56,7 @@ alt-o = 'exec-and-forget open "/Applications/Beekeeper Studio.app"'
 alt-d = 'exec-and-forget open -a "Docker Desktop"'
 
 # Open new windows for apps.
-alt-shift-enter = 'exec-and-forget open -n "/Applications/Warp.app"'
+alt-shift-enter = 'exec-and-forget open -n "/Applications/WezTerm.app"'
 
 # =============================================================================
 # Workspaces
